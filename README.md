@@ -1,13 +1,10 @@
-## 프로젝트
+## 콘서트 예약 서비스
 
-## Getting Started
+---
 
-### Prerequisites
+### 프로젝트 문서
 
-#### Running Docker Containers
-
-`local` profile 로 실행하기 위하여 인프라가 설정되어 있는 Docker 컨테이너를 실행해주셔야 합니다.
-
-```bash
-docker-compose up -d
-```
+- [요구사항](./docs/요구사항.md)
+- [마일스톤](./docs/마일스톤.md)
+- [시퀀스 다이어그램](./docs/시퀀스다이어그램.md)
+- [ERD 다이어그램](./docs/images/ERD%20다이어그램.png)
