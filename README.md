@@ -8,3 +8,4 @@
 - [마일스톤](./docs/마일스톤.md)
 - [시퀀스 다이어그램](./docs/시퀀스다이어그램.md)
 - [ERD 다이어그램](./docs/images/ERD%20다이어그램.png)
+- [API 명세서](./docs/API명세.md)
