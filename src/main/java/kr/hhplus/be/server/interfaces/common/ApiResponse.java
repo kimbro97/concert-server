@@ -40,7 +40,7 @@ public class ApiResponse <T> {
 		return new ApiResponse<>(CREATED, CREATED.value(), message, data);
 	}
 
-	public ResponseEntity<ApiResponse<T>> toResponseEntity() {
-		return ResponseEntity.status(httpStatus).body(this);
+	public static <T> ApiResponse<T> BusinessException(HttpStatus httpStatus, String message) {
+		return new ApiResponse<>(httpStatus, httpStatus.value(), message, null);
 	}
 }
