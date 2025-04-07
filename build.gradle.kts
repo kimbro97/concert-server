@@ -38,6 +38,10 @@ dependencies {
 	// swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
+	// Lombok
+	annotationProcessor ("org.projectlombok:lombok")
+	compileOnly ("org.projectlombok:lombok")
+
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
