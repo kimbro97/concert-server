@@ -1,11 +1,14 @@
-package kr.hhplus.be.server.controller.payment;
+package kr.hhplus.be.server.interfaces.payment;
 
 import java.time.LocalDateTime;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import kr.hhplus.be.server.interfaces.common.ApiResponse;
 
 @RestController
 public class PaymentController implements PaymentControllerDocs {

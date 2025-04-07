@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.payment;
+package kr.hhplus.be.server.interfaces.payment;
 
 public class PaymentRequest {
 	private final Long reservationId;

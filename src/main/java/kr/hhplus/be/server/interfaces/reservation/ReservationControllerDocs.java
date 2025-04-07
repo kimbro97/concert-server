@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.reservation;
+package kr.hhplus.be.server.interfaces.reservation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

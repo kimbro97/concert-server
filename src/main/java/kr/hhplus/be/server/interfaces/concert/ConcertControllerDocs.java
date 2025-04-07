@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.concert;
+package kr.hhplus.be.server.interfaces.concert;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

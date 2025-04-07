@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.payment;
+package kr.hhplus.be.server.interfaces.payment;
 
 import java.time.LocalDateTime;
 

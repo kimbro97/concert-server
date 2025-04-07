@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.concert;
+package kr.hhplus.be.server.interfaces.concert;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

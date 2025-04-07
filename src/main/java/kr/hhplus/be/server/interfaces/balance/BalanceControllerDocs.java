@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.balance;
+package kr.hhplus.be.server.interfaces.balance;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

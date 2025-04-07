@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.balance;
+package kr.hhplus.be.server.interfaces.balance;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

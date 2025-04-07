@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.balance;
+package kr.hhplus.be.server.interfaces.balance;
 
 public class ChargeRequest {
 	private final Long userId;
