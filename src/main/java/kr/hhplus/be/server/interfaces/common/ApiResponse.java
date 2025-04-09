@@ -38,4 +38,8 @@ public class ApiResponse<T> {
 	public static <T> ApiResponse<T> CREATE(String message, T data) {
 		return new ApiResponse<>(CREATED, CREATED.value(), message, data);
 	}
+
+	public static <T> ApiResponse<T> BusinessException(HttpStatus httpStatus, String message) {
+		return new ApiResponse<>(httpStatus, httpStatus.value(), message, null);
+	}
 }
