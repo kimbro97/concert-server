@@ -7,15 +7,13 @@ public class ChargeRequest {
 
 	private static final Long MIN_CHARGE_AMOUNT = 0L;
 
-	private final Long userId;
 	private final Long amount;
 
-	public ChargeRequest(Long userId, Long amount) {
-		this.userId = userId;
+	public ChargeRequest(Long amount) {
 		this.amount = amount;
 	}
 
-	public BalanceCommand.Charge toCommand() {
+	public BalanceCommand.Charge toCommand(Long userId) {
 		this.validate();
 		return new BalanceCommand.Charge(userId, amount);
 	}

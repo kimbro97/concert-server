@@ -19,7 +19,7 @@ public class BalanceController implements BalanceControllerDocs {
 
 	@PutMapping("/api/v1/balance/charge")
 	public ApiResponse<BalanceInfo> charge(@UserId Long userId, @RequestBody ChargeRequest request) {
-		return ApiResponse.OK(balanceUseCase.charge(request.toCommand()));
+		return ApiResponse.OK(balanceUseCase.charge(request.toCommand(userId)));
 	}
 
 	@GetMapping("/api/v1/balance")
