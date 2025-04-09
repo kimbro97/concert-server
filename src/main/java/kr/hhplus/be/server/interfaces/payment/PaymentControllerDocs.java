@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.payment;
+package kr.hhplus.be.server.interfaces.payment;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

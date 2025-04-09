@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.concert;
+package kr.hhplus.be.server.interfaces.concert;
 
 public class ConcertScheduleSeatResponse {
 	private Integer seatNo;

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.token;
+package kr.hhplus.be.server.interfaces.token;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

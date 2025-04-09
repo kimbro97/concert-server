@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.token;
+package kr.hhplus.be.server.interfaces.token;
 
 public class WaitingTokenResponse {
 	private final Long location;

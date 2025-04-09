@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.controller.reservation;
+package kr.hhplus.be.server.interfaces.reservation;
 
 public class ReservationRequest {
 	private final Long reservation_id;
