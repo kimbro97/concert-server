@@ -1,0 +1,103 @@
+package kr.hhplus.be.server.service.token;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import kr.hhplus.be.server.domain.concert.Concert;
+import kr.hhplus.be.server.domain.concert.ConcertRepository;
+import kr.hhplus.be.server.domain.concert.Schedule;
+import kr.hhplus.be.server.domain.token.Token;
+import kr.hhplus.be.server.domain.token.TokenRepository;
+import kr.hhplus.be.server.domain.token.TokenStatus;
+import kr.hhplus.be.server.domain.user.User;
+import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.exception.BusinessException;
+
+@ExtendWith(MockitoExtension.class)
+class TokenServiceTest {
+	@Mock UserRepository userRepository;
+
+	@Mock ConcertRepository concertRepository;
+
+	@Mock TokenRepository tokenRepository;
+
+	@InjectMocks TokenService tokenService;
+
+	@Test
+	@DisplayName("토큰 생성 요청 시 UUID 기반의 PENDING 상태 토큰이 저장되고 반환된다")
+	void createToken_성공() {
+		// arrange
+		Long userId = 1L;
+		Long scheduleId = 10L;
+		TokenCommand command = new TokenCommand(userId, scheduleId);
+
+		User user = new User("testUser", "1234");
+		Concert concert = new Concert("방탄콘서트");
+		Schedule schedule = new Schedule(concert, LocalDate.now());
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+		when(concertRepository.findScheduleById(scheduleId)).thenReturn(Optional.of(schedule));
+
+		Token mockToken = Token.create(user, schedule, "uuid-123", TokenStatus.PENDING);
+		when(tokenRepository.save(any(Token.class))).thenReturn(mockToken);
+
+		// act
+		TokenInfo result = tokenService.createToken(command);
+
+		// assert
+		assertThat(result).isNotNull();
+		assertThat(result.getTokenValue()).isEqualTo("uuid-123");
+
+		verify(userRepository).findById(userId);
+		verify(concertRepository).findScheduleById(scheduleId);
+		verify(tokenRepository).save(any(Token.class));
+	}
+	@Test
+	@DisplayName("존재하지 않는 유저 ID로 토큰 생성 시 예외가 발생한다")
+	void createToken_실패_유저없음() {
+		// arrange
+		Long userId = 1L;
+		Long scheduleId = 10L;
+		TokenCommand command = new TokenCommand(userId, scheduleId);
+
+		when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+		// act & assert
+		assertThatThrownBy(() -> tokenService.createToken(command))
+			.isInstanceOf(BusinessException.class);
+
+		// 이후 로직이 실행되지 않는지 검증
+		verify(concertRepository, never()).findScheduleById(any());
+		verify(tokenRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 스케줄 ID로 토큰 생성 시 예외가 발생한다")
+	void createToken_실패_스케줄없음() {
+		// arrange
+		Long userId = 1L;
+		Long scheduleId = 10L;
+		TokenCommand command = new TokenCommand(userId, scheduleId);
+
+		User user = new User("tester", "pw");
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+		when(concertRepository.findScheduleById(scheduleId)).thenReturn(Optional.empty());
+
+		// act & assert
+		assertThatThrownBy(() -> tokenService.createToken(command))
+			.isInstanceOf(BusinessException.class);
+
+		// token 저장이 실행되지 않아야 함
+		verify(tokenRepository, never()).save(any());
+	}
+}
