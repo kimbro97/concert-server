@@ -3,7 +3,7 @@ package kr.hhplus.be.server.support.advice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.support.exception.BusinessException;
 
 @RestControllerAdvice
