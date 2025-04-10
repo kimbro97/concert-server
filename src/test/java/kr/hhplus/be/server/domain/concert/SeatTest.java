@@ -49,4 +49,17 @@ class SeatTest {
 		// assert: 상태가 여전히 false인지 확인 (변경 안 됨)
 		assertThat(seat.getIsSelectable()).isFalse();
 	}
+
+	@Test
+	@DisplayName("좌석을 취소하면 isSelectable 값이 true가 된다")
+	void cancel_성공() {
+		// arrange
+		Seat seat = new Seat(null, "A1", 10000L, false); // 이미 예약된 좌석 상태
+
+		// act
+		seat.cancel();
+
+		// assert
+		assertThat(seat.getIsSelectable()).isTrue();
+	}
 }

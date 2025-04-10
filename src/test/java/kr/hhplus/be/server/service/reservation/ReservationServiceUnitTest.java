@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -117,5 +119,25 @@ class ReservationServiceUnitTest {
 			.hasMessageContaining(NOT_FOUND_SEAT_ERROR.getMessage());
 
 		verify(reservationRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("만료된 예약들을 조회하여 모두 cancel()을 호출한다")
+	void cancel_만료예약_취소() {
+		// arrange
+		Reservation reservation1 = mock(Reservation.class);
+		Reservation reservation2 = mock(Reservation.class);
+
+		when(reservationRepository.findAllByStatusAndExpiredAtBefore(
+			eq(ReservationStatus.RESERVED),
+			any(LocalDateTime.class)
+		)).thenReturn(List.of(reservation1, reservation2));
+
+		// act
+		reservationService.cancel();
+
+		// assert
+		verify(reservation1).cancel();
+		verify(reservation2).cancel();
 	}
 }

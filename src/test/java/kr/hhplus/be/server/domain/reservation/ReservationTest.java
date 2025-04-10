@@ -89,4 +89,23 @@ class ReservationTest {
 		assertThatThrownBy(() -> reservation.validateNotExpired(LocalDateTime.now()))
 			.isInstanceOf(BusinessException.class);
 	}
+
+	@Test
+	@DisplayName("예약을 취소하면 상태가 CANCEL로 변경되고 좌석도 취소 처리된다")
+	void cancel_성공() {
+		// arrange
+		User user = new User("testUser", "1234");
+		Schedule schedule = mock(Schedule.class);
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+		reservation.reserve(java.time.LocalDateTime.now().plusMinutes(5)); // RESERVED 상태로 만들어줌
+
+		// act
+		reservation.cancel();
+
+		// assert
+		assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCEL);
+		verify(seat, times(1)).cancel(); // seat.cancel() 이 호출되었는지 검증
+	}
 }
