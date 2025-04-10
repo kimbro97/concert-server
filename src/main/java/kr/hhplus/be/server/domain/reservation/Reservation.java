@@ -71,6 +71,12 @@ public class Reservation extends BaseEntity {
 		if (this.expiredAt.isBefore(now)) {
 			throw BusinessError.EXPIRED_RESERVATION_ERROR.exception();
 		}
+		this.status = ReservationStatus.CONFIRMED;
+	}
+
+	public void cancel() {
+		this.status = ReservationStatus.CANCEL;
+		this.seat.cancel();
 	}
 
 	public static Reservation create(User user, Schedule schedule, Seat seat) {
@@ -80,5 +86,4 @@ public class Reservation extends BaseEntity {
 			.seat(seat)
 			.build();
 	}
-
 }

@@ -47,9 +47,12 @@ public class Seat extends BaseEntity {
 	}
 
 	public void reserve() {
-		System.out.println(this.isSelectable);
 		validateSelectable();
 		isSelectable = false;
+	}
+
+	public void cancel() {
+		isSelectable = true;
 	}
 
 	private void validateSelectable() {
