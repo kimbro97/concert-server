@@ -7,22 +7,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.service.reservation.ReservationInfo;
+import kr.hhplus.be.server.service.reservation.ReservationService;
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class ReservationController implements ReservationControllerDocs {
+
+	private final ReservationService reservationService;
+
 	@PostMapping("/api/v1/reservation")
-	public ResponseEntity<ReservationResponse> reserve(
-		@RequestBody ReservationRequest request
-	) {
-		ReservationResponse response = new ReservationResponse(
-			1L,
-			12345L,
-			10L,
-			25L,
-			50000L,
-			"CONFIRMED",
-			LocalDateTime.now().minusDays(1),
-			LocalDateTime.now()
-		);
-		return ResponseEntity.status(201).body(response);
+	public ApiResponse<ReservationInfo> reserve(@RequestBody ReservationRequest request) {
+		return ApiResponse.CREATE(reservationService.reserve(request.toCommand()));
 	}
 }
