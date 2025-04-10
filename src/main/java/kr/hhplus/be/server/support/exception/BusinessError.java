@@ -22,7 +22,11 @@ public enum BusinessError {
 	// 콘서트 관련 Error
 	NOT_FOUND_CONCERT_ERROR(NOT_FOUND, "콘서트 항목을 찾을 수 없습니다." ),
 	PAST_DATE_NOT_ALLOWED(BAD_REQUEST, "지난 날짜는 조회할 수 없습니다."),
-	NOT_FOUND_SCHEDULE_ERROR(NOT_FOUND, "스케줄 항목을 찾을 수 없습니다." );
+	NOT_FOUND_SCHEDULE_ERROR(NOT_FOUND, "스케줄 항목을 찾을 수 없습니다." ),
+	NOT_FOUND_SEAT_ERROR(NOT_FOUND, "좌석을 찾을 수 없습니다." ),
+
+	// 예약 관련
+	ALREADY_RESERVED_SEAT(BAD_REQUEST, "이미 예약된 좌석입니다.");
 
 
 	private final HttpStatus httpStatus;

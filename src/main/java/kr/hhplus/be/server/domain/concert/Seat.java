@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import kr.hhplus.be.server.domain.BaseEntity;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,5 +40,21 @@ public class Seat extends BaseEntity {
 		this.number = number;
 		this.price = price;
 		this.isSelectable = isSelectable;
+	}
+
+	public Long calculatePrice() {
+		return this.price;
+	}
+
+	public void reserve() {
+		System.out.println(this.isSelectable);
+		validateSelectable();
+		isSelectable = false;
+	}
+
+	private void validateSelectable() {
+		if (Boolean.FALSE.equals(this.isSelectable)) {
+			throw BusinessError.ALREADY_RESERVED_SEAT.exception();
+		}
 	}
 }

@@ -8,7 +8,7 @@ public interface ConcertRepository {
 
 	Optional<Concert> findConcertById(Long concertId);
 	Optional<Schedule> findScheduleById(Long ScheduleId);
-
+	Optional<Seat> findSeatById(Long SeatId);
 	List<Seat> findAllSeatByScheduleId(Long scheduleId);
 	List<Schedule> findAllByConcertIdAndDateBetween(Long concertId, LocalDate startDate, LocalDate endDate);
 
