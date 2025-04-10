@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.balance;
+package kr.hhplus.be.server.interfaces.api.balance;
 
 import kr.hhplus.be.server.service.balance.BalanceCommand;
 import kr.hhplus.be.server.support.exception.BusinessError;

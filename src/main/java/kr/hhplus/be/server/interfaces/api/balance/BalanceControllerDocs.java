@@ -1,11 +1,11 @@
-package kr.hhplus.be.server.interfaces.balance;
+package kr.hhplus.be.server.interfaces.api.balance;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.service.balance.BalanceInfo;
 
 @Tag(name = "Balance", description = "유저 잔액 관련 API")

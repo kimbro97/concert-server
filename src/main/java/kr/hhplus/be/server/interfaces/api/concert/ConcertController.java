@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.concert;
+package kr.hhplus.be.server.interfaces.api.concert;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.service.concert.ConcertCommand;
 import kr.hhplus.be.server.service.concert.ConcertInfo;
 import kr.hhplus.be.server.service.concert.ConcertService;

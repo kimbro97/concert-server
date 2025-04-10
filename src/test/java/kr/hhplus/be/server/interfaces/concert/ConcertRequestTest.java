@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import kr.hhplus.be.server.interfaces.api.concert.ConcertRequest;
 import kr.hhplus.be.server.service.concert.ConcertCommand;
 import kr.hhplus.be.server.support.exception.BusinessException;
 

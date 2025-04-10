@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.token;
+package kr.hhplus.be.server.interfaces.api.token;
 
 public class TokenResponse {
 	private final String token;

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.reservation;
+package kr.hhplus.be.server.interfaces.api.reservation;
 
 import kr.hhplus.be.server.service.reservation.ReservationCommand;
 import lombok.Getter;

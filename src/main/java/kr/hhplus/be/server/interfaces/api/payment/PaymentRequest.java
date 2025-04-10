@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.payment;
+package kr.hhplus.be.server.interfaces.api.payment;
 
 import kr.hhplus.be.server.service.payment.PaymentCommand;
 import lombok.Getter;

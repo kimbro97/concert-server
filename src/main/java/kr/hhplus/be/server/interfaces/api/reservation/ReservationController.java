@@ -1,13 +1,10 @@
-package kr.hhplus.be.server.interfaces.reservation;
+package kr.hhplus.be.server.interfaces.api.reservation;
 
-import java.time.LocalDateTime;
-
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.service.reservation.ReservationInfo;
 import kr.hhplus.be.server.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;

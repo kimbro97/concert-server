@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.concert;
+package kr.hhplus.be.server.interfaces.api.concert;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 

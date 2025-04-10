@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import kr.hhplus.be.server.interfaces.api.balance.ChargeRequest;
 import kr.hhplus.be.server.service.balance.BalanceCommand;
 import kr.hhplus.be.server.support.exception.BusinessException;
 

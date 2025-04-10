@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.concert;
+package kr.hhplus.be.server.interfaces.api.concert;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +20,7 @@ public interface ConcertControllerDocs {
 	@ApiResponse(responseCode = "200", description = "콘서트 일정 조회 성공",
 		content = @Content(mediaType = "application/json"))
 	@GetMapping("/api/v1/concert/{concert_id}/schedule")
-	kr.hhplus.be.server.interfaces.common.ApiResponse<List<ConcertInfo.ScheduleInfo>> getConcertSchedules(
+	kr.hhplus.be.server.interfaces.api.common.ApiResponse<List<ConcertInfo.ScheduleInfo>> getConcertSchedules(
 		@Parameter(description = "조회할 콘서트의 ID")
 		@PathVariable("concert_id") Long concertId,
 
@@ -31,7 +31,7 @@ public interface ConcertControllerDocs {
 	@ApiResponse(responseCode = "200", description = "콘서트 좌석 조회 성공",
 		content = @Content(mediaType = "application/json"))
 	@GetMapping("/api/v1/schedule/{schedule_id}/seat")
-	kr.hhplus.be.server.interfaces.common.ApiResponse<List<ConcertInfo.SeatInfo>> getSeat(
+	kr.hhplus.be.server.interfaces.api.common.ApiResponse<List<ConcertInfo.SeatInfo>> getSeat(
 		@Parameter(description = "조회할 콘서트 일정의 ID")
 		@PathVariable("schedule_id") Long scheduleId
 	);

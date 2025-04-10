@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.interfaces.payment;
+package kr.hhplus.be.server.interfaces.api.payment;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,7 +18,7 @@ public interface PaymentControllerDocs {
 	@ApiResponse(responseCode = "201", description = "결제 성공",
 		content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentInfo.class)))
 	@PostMapping("/api/v1/payment")
-	kr.hhplus.be.server.interfaces.common.ApiResponse<PaymentInfo> pay(
+	kr.hhplus.be.server.interfaces.api.common.ApiResponse<PaymentInfo> pay(
 		@Parameter(description = "결제 요청 정보", required = true)
 		@RequestBody PaymentRequest request
 	);

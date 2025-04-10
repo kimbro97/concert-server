@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.interfaces.reservation;
+package kr.hhplus.be.server.interfaces.api.reservation;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,7 +18,7 @@ public interface ReservationControllerDocs {
 	@ApiResponse(responseCode = "201", description = "예약 성공",
 		content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReservationInfo.class)))
 	@PostMapping("/api/v1/reservation")
-	kr.hhplus.be.server.interfaces.common.ApiResponse<ReservationInfo> reserve(
+	kr.hhplus.be.server.interfaces.api.common.ApiResponse<ReservationInfo> reserve(
 		@Parameter(description = "예약 정보를 입력해주세요.")
 		@RequestBody ReservationRequest request
 	);
