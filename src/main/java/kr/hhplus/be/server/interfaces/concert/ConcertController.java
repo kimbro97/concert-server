@@ -1,40 +1,36 @@
 package kr.hhplus.be.server.interfaces.concert;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.service.concert.ConcertCommand;
+import kr.hhplus.be.server.service.concert.ConcertInfo;
+import kr.hhplus.be.server.service.concert.ConcertService;
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class ConcertController implements ConcertControllerDocs {
 
+	private final ConcertService concertService;
+
 	@GetMapping("/api/v1/concert/{concert_id}/schedule")
-	public ResponseEntity<List<ConcertScheduleResponse>> getConcertSchedules(
+	public ApiResponse<List<ConcertInfo.ScheduleInfo>> getConcertSchedules(
 		@PathVariable("concert_id") Long concertId,
-		@RequestHeader("WAITING_TOKEN") String token
+		@ModelAttribute ConcertRequest.ConcertSchedule request
 	) {
-		List<ConcertScheduleResponse> concertScheduleResponses = List.of(
-			new ConcertScheduleResponse(LocalDate.of(2025, 1, 11)),
-			new ConcertScheduleResponse(LocalDate.of(2025, 1, 12))
-		);
-		return ResponseEntity.ok(concertScheduleResponses);
+		return ApiResponse.OK(concertService.getSchedule(request.toCommand(concertId)));
 	}
 
-	@GetMapping("/api/v1/concert/{concert_id}/schedule/{concert_schedule_id}/seat")
-	public ResponseEntity<List<ConcertScheduleSeatResponse>> getSeat(
-		@PathVariable("concert_id") Long concertId,
-		@PathVariable("concert_schedule_id") Long concertScheduleId,
-		@RequestHeader("WAITING_TOKEN") String token
+	@GetMapping("/api/v1/schedule/{schedule_id}/seat")
+	public ApiResponse<List<ConcertInfo.SeatInfo>> getSeat(
+		@PathVariable("schedule_id") Long scheduleId
 	) {
-		List<ConcertScheduleSeatResponse> list = new ArrayList<>();
-		for (int i = 1; i <= 50; i++) {
-			list.add(new ConcertScheduleSeatResponse(i, Boolean.TRUE));
-		}
-		return ResponseEntity.ok(list);
+		return ApiResponse.OK(concertService.getSeat(new ConcertCommand.Seat(scheduleId)));
 	}
 }
