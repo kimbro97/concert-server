@@ -19,6 +19,7 @@ import kr.hhplus.be.server.domain.BaseEntity;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.concert.Seat;
 import kr.hhplus.be.server.domain.user.User;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,11 +60,17 @@ public class Reservation extends BaseEntity {
 		this.seat = seat;
 	}
 
-	public void reserve() {
+	public void reserve(LocalDateTime expiredAt) {
 		seat.reserve();
 		this.totalAmount = seat.calculatePrice();
 		this.status = ReservationStatus.RESERVED;
-		this.expiredAt = LocalDateTime.now().plusMinutes(5);
+		this.expiredAt = expiredAt;
+	}
+
+	public void validateNotExpired(LocalDateTime now) {
+		if (this.expiredAt.isBefore(now)) {
+			throw BusinessError.EXPIRED_RESERVATION_ERROR.exception();
+		}
 	}
 
 	public static Reservation create(User user, Schedule schedule, Seat seat) {

@@ -26,7 +26,11 @@ public enum BusinessError {
 	NOT_FOUND_SEAT_ERROR(NOT_FOUND, "좌석을 찾을 수 없습니다." ),
 
 	// 예약 관련
-	ALREADY_RESERVED_SEAT(BAD_REQUEST, "이미 예약된 좌석입니다.");
+	ALREADY_RESERVED_SEAT(BAD_REQUEST, "이미 예약된 좌석입니다."),
+	NOT_FOUND_RESERVATION_ERROR(BAD_REQUEST, "예약 항목을 찾을 수 없습니다."),
+
+	// 결제
+	EXPIRED_RESERVATION_ERROR(BAD_REQUEST, "예약시간이 만료되어 결제하실 수 없습니다.");
 
 
 	private final HttpStatus httpStatus;

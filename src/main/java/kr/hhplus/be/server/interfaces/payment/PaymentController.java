@@ -7,20 +7,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.hhplus.be.server.interfaces.common.ApiResponse;
+import kr.hhplus.be.server.service.payment.PaymentInfo;
+import kr.hhplus.be.server.service.payment.PaymentService;
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class PaymentController implements PaymentControllerDocs {
 
+	private final PaymentService paymentService;
+
 	@PostMapping
-	public ResponseEntity<PaymentResponse> pay(
-		@RequestBody PaymentRequest request
-	) {
-		PaymentResponse response = new PaymentResponse(
-			1L, // paymentId
-			100L, // reservationId
-			50000L, // totalAmount
-			LocalDateTime.now().minusDays(1), // createdAt
-			LocalDateTime.now() // updatedAt
-		);
-		return ResponseEntity.status(201).body(response);
+	public ApiResponse<PaymentInfo> pay(@RequestBody PaymentRequest request) {
+		return ApiResponse.CREATE(paymentService.pay(request.toCommand()));
 	}
 }

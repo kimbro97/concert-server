@@ -2,6 +2,8 @@ package kr.hhplus.be.server.service.reservation;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
@@ -34,9 +36,7 @@ public class ReservationService {
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
-		reservation.reserve();
-
-		System.out.println("resu" + reservation);
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
 
 		Reservation savedReservation = reservationRepository.save(reservation);
 
