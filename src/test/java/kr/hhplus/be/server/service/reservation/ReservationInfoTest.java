@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class ReservationInfoTest {
 		Seat seat = new Seat(schedule, "A1", 12000L, true);
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
-		reservation.reserve();
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
 
 		// act
 		ReservationInfo info = ReservationInfo.from(reservation);

@@ -27,7 +27,7 @@ class ReservationTest {
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
 		// act
-		reservation.reserve();
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
 
 		// assert
 		assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.RESERVED);
@@ -53,7 +53,7 @@ class ReservationTest {
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
 		// act & assert
-		assertThatThrownBy(reservation::reserve)
+		assertThatThrownBy(() -> reservation.reserve(LocalDateTime.now().plusMinutes(5)))
 			.isInstanceOf(BusinessException.class)
 			.hasMessageContaining("이미 예약된 좌석");
 
@@ -62,5 +62,31 @@ class ReservationTest {
 		assertThat(reservation.getStatus()).isNull();
 		assertThat(reservation.getTotalAmount()).isNull();
 		assertThat(reservation.getExpiredAt()).isNull();
+	}
+	@Test
+	@DisplayName("예약이 만료되지 않았다면 예외가 발생하지 않는다")
+	void validateNotExpired_정상() {
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+
+		reservation.validateNotExpired(LocalDateTime.now());
+	}
+
+	@Test
+	@DisplayName("예약이 만료되었다면 예외가 발생하고 이후 로직은 실행되지 않는다")
+	void validateNotExpired_예외() {
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+		reservation.reserve(LocalDateTime.now().minusMinutes(5));
+
+		assertThatThrownBy(() -> reservation.validateNotExpired(LocalDateTime.now()))
+			.isInstanceOf(BusinessException.class);
 	}
 }
