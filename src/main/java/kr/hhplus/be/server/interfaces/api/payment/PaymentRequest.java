@@ -13,7 +13,7 @@ public class PaymentRequest {
 		this.reservationId = reservationId;
 	}
 
-	public PaymentCommand toCommand() {
-		return new PaymentCommand(userId, reservationId);
+	public PaymentCommand toCommand(String uuid) {
+		return new PaymentCommand(userId, reservationId, uuid);
 	}
 }

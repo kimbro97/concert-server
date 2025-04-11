@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import kr.hhplus.be.server.support.interceptor.LoginInterceptor;
+import kr.hhplus.be.server.support.interceptor.TokenInterceptor;
 import kr.hhplus.be.server.support.resolver.UserIdArgumentResolver;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class WebConfig implements WebMvcConfigurer {
 
 	private final LoginInterceptor loginInterceptor;
+	private final TokenInterceptor tokenInterceptor;
 	private final UserIdArgumentResolver userIdArgumentResolver;
 
 	@Override
@@ -26,6 +28,13 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(loginInterceptor)
-			.addPathPatterns("/api/v1");
+			.addPathPatterns("/api/v1**");
+
+		registry.addInterceptor(tokenInterceptor)
+			.addPathPatterns(
+				"/api/v1/schedule/*/seat",
+				"/api/v1/reservation",
+				"/api/v1/payment"
+			);
 	}
 }
