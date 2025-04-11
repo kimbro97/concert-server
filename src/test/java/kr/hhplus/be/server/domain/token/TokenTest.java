@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.token;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 
@@ -30,5 +31,50 @@ class TokenTest {
 		assertThat(token.getSchedule()).isEqualTo(schedule);
 		assertThat(token.getUuid()).isEqualTo(uuid);
 		assertThat(token.getStatus()).isEqualTo(status);
+	}
+
+	@Test
+	@DisplayName("토큰의 순번이 1이고 활성 토큰 수가 최대보다 작으면 상태를 ACTIVE로 변경한다")
+	void activateIfFirstAndAvailable_조건충족() {
+		// arrange
+		User user = new User("kimbro", "1234");
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, "uuid-1", TokenStatus.PENDING);
+
+		// act
+		token.activateIfFirstAndAvailable(1L, 500L);
+
+		// assert
+		assertThat(token.getStatus()).isEqualTo(TokenStatus.ACTIVE);
+	}
+
+	@Test
+	@DisplayName("토큰의 순번이 1이 아니면 상태를 변경하지 않는다")
+	void activateIfFirstAndAvailable_순번1아님() {
+		// arrange
+		User user = new User("kimbro", "1234");
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, "uuid-2", TokenStatus.PENDING);
+
+		// act
+		token.activateIfFirstAndAvailable(2L, 500L);
+
+		// assert
+		assertThat(token.getStatus()).isEqualTo(TokenStatus.PENDING);
+	}
+
+	@Test
+	@DisplayName("활성 토큰 수가 최대치를 넘으면 상태를 변경하지 않는다")
+	void activateIfFirstAndAvailable_최대초과() {
+		// arrange
+		User user = new User("kimbro", "1234");
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, "uuid-3", TokenStatus.PENDING);
+
+		// act
+		token.activateIfFirstAndAvailable(1L, 1000L);
+
+		// assert
+		assertThat(token.getStatus()).isEqualTo(TokenStatus.PENDING);
 	}
 }

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.service.token;
 
+import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -99,5 +100,70 @@ class TokenServiceTest {
 
 		// token 저장이 실행되지 않아야 함
 		verify(tokenRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("토큰 위치 조회 시 조건을 만족하면 상태가 ACTIVE로 변경되고 정보가 반환된다")
+	void getTokenLocation_성공() {
+		// arrange
+		String uuid = "uuid-1234";
+		Long scheduleId = 1L;
+		Long location = 1L;
+		Long activeCount = 999L;
+
+		Schedule schedule = mock(Schedule.class);
+		when(schedule.getId()).thenReturn(scheduleId);
+
+		Token token = Token.create(new User("test", "1234"), schedule, uuid, TokenStatus.PENDING);
+
+		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
+		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(location);
+		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE)).thenReturn(activeCount);
+
+		// act
+		TokenLocationInfo info = tokenService.getTokenLocation(new TokenLocationCommand(uuid));
+
+		// assert
+		assertThat(info).isNotNull();
+		assertThat(info.getStatus()).isEqualTo("ACTIVE");
+		assertThat(info.getScheduleId()).isEqualTo(scheduleId);
+		assertThat(info.getLocation()).isEqualTo(location);
+	}
+
+	@Test
+	@DisplayName("uuid로 토큰을 찾을 수 없으면 예외가 발생한다")
+	void getTokenLocation_토큰없음() {
+		// arrange
+		String uuid = "invalid-uuid";
+		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.empty());
+
+		// act & assert
+		assertThatThrownBy(() -> tokenService.getTokenLocation(new TokenLocationCommand(uuid)))
+			.isInstanceOf(BusinessException.class);
+	}
+
+	@Test
+	@DisplayName("location이 1이 아니거나 activeCount가 최대이면 상태를 변경하지 않는다")
+	void getTokenLocation_조건불충족_상태변경안함() {
+		// arrange
+		String uuid = "uuid-5678";
+		Long scheduleId = 1L;
+		Long location = 2L;
+		Long activeCount = 1000L;
+
+		Schedule schedule = mock(Schedule.class);
+		when(schedule.getId()).thenReturn(scheduleId);
+
+		Token token = Token.create(new User("user", "pass"), schedule, uuid, TokenStatus.PENDING);
+
+		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
+		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(location);
+		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE)).thenReturn(activeCount);
+
+		// act
+		TokenLocationInfo info = tokenService.getTokenLocation(new TokenLocationCommand(uuid));
+
+		// assert
+		assertThat(info.getStatus()).isEqualTo("PENDING");
 	}
 }
