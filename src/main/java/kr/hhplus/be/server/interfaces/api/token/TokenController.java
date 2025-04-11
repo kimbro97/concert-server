@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import kr.hhplus.be.server.interfaces.api.common.ApiResponse;
 import kr.hhplus.be.server.service.token.TokenInfo;
+import kr.hhplus.be.server.service.token.TokenLocationCommand;
+import kr.hhplus.be.server.service.token.TokenLocationInfo;
 import kr.hhplus.be.server.service.token.TokenService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +28,7 @@ public class TokenController implements TokenControllerDocs {
 	}
 
 	@GetMapping
-	public ResponseEntity<WaitingTokenResponse> getToken(@RequestHeader("WAITING-TOKEN") String token) {
-		return ResponseEntity.ok(new WaitingTokenResponse(1L));
+	public ApiResponse<TokenLocationInfo> getToken(@RequestHeader("WAITING-TOKEN") String token) {
+		return ApiResponse.OK(tokenService.getTokenLocation(new TokenLocationCommand(token)));
 	}
 }

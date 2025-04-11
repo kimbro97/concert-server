@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PROTECTED)
 public class Token extends BaseEntity {
 
+	private static final Long MAX_ACTIVE = 1000L;
+
 	@Id
 	@Column(name = "token_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,5 +59,11 @@ public class Token extends BaseEntity {
 			.uuid(uuid)
 			.status(status)
 			.build();
+	}
+
+	public void activateIfFirstAndAvailable(Long location, Long activeCount) {
+		if (location == 1L && activeCount < MAX_ACTIVE) {
+			this.status = TokenStatus.ACTIVE;
+		}
 	}
 }

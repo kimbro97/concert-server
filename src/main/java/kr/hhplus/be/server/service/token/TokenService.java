@@ -2,9 +2,11 @@ package kr.hhplus.be.server.service.token;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
@@ -13,6 +15,7 @@ import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.token.TokenStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,6 +26,7 @@ public class TokenService {
 	private final TokenRepository tokenRepository;
 	private final ConcertRepository concertRepository;
 
+	@Transactional
 	public TokenInfo createToken(TokenCommand command) {
 
 		User user = userRepository.findById(command.getUserId())
@@ -37,5 +41,22 @@ public class TokenService {
 		Token savedToken = tokenRepository.save(token);
 
 		return TokenInfo.from(savedToken);
+	}
+
+	@Transactional
+	public TokenLocationInfo getTokenLocation(TokenLocationCommand command) {
+
+		Token token = tokenRepository.findByUuid(command.getUuid())
+			.orElseThrow(NOT_FOUND_TOKEN_ERROR::exception);
+
+		Long scheduleId = token.getSchedule().getId();
+
+		Long location = tokenRepository.findTokenLocation(scheduleId, command.getUuid(), TokenStatus.PENDING);
+
+		Long activeCount = tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE);
+
+		token.activateIfFirstAndAvailable(location, activeCount);
+
+		return new TokenLocationInfo(scheduleId, location, token.getStatus());
 	}
 }
