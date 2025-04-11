@@ -12,4 +12,5 @@ public interface TokenRepository {
 
 	Long countByScheduleIdAndStatus(Long scheduleId, TokenStatus status);
 
+	void deleteByUuid(String uuid);
 }

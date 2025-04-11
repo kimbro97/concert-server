@@ -2,6 +2,7 @@ package kr.hhplus.be.server.interfaces.api.payment;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +20,7 @@ public interface PaymentControllerDocs {
 		content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentInfo.class)))
 	@PostMapping("/api/v1/payment")
 	kr.hhplus.be.server.interfaces.api.common.ApiResponse<PaymentInfo> pay(
+		@RequestHeader("WAITTING-TOKEN") String uuid,
 		@Parameter(description = "결제 요청 정보", required = true)
 		@RequestBody PaymentRequest request
 	);
