@@ -8,7 +8,7 @@ public interface TokenRepository {
 
 	Token save(Token token);
 
-	Long findTokenLocation(Long scheduleId, String uuid);
+	Long findTokenLocation(Long scheduleId, String uuid, TokenStatus status);
 
 	Long countByScheduleIdAndStatus(Long scheduleId, TokenStatus status);
 

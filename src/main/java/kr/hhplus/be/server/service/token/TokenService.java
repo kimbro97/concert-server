@@ -44,16 +44,18 @@ public class TokenService {
 	@Transactional
 	public TokenLocationInfo getTokenLocation(TokenLocationCommand command) {
 
+		Long location = 1L;
+
 		Token token = tokenRepository.findByUuid(command.getUuid())
 			.orElseThrow(NOT_FOUND_TOKEN_ERROR::exception);
 
 		Long scheduleId = token.getSchedule().getId();
 
-		Long location = tokenRepository.findTokenLocation(scheduleId, command.getUuid());
-
 		if (token.isActive()) {
-			location = 1L;
+			return new TokenLocationInfo(scheduleId, location, token.getStatus());
 		}
+
+		location = tokenRepository.findTokenLocation(scheduleId, command.getUuid(), TokenStatus.PENDING);
 
 		return new TokenLocationInfo(scheduleId, location, token.getStatus());
 	}

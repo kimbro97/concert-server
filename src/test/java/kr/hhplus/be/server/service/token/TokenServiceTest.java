@@ -114,7 +114,7 @@ class TokenServiceTest {
 
 		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
 		when(schedule.getId()).thenReturn(scheduleId);
-		when(tokenRepository.findTokenLocation(scheduleId, uuid)).thenReturn(1L);
+		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(1L);
 		// act
 
 		TokenLocationInfo info = tokenService.getTokenLocation(command);
@@ -139,7 +139,6 @@ class TokenServiceTest {
 
 		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
 		when(schedule.getId()).thenReturn(scheduleId);
-		when(tokenRepository.findTokenLocation(scheduleId, uuid)).thenReturn(2L);
 		// act
 
 		TokenLocationInfo info = tokenService.getTokenLocation(command);
