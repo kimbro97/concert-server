@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.service.token;
 
-import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -103,31 +102,53 @@ class TokenServiceTest {
 	}
 
 	@Test
-	@DisplayName("토큰 위치 조회 시 조건을 만족하면 상태가 ACTIVE로 변경되고 정보가 반환된다")
+	@DisplayName("토큰 위치 조회 시 해당 토큰의 위치를 반환한다")
 	void getTokenLocation_성공() {
 		// arrange
-		String uuid = "uuid-1234";
+		String uuid = "uuid_1";
 		Long scheduleId = 1L;
-		Long location = 1L;
-		Long activeCount = 999L;
-
+		User user = mock(User.class);
 		Schedule schedule = mock(Schedule.class);
-		when(schedule.getId()).thenReturn(scheduleId);
-
-		Token token = Token.create(new User("test", "1234"), schedule, uuid, TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, uuid, TokenStatus.PENDING);
+		TokenLocationCommand command = new TokenLocationCommand(uuid);
 
 		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
-		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(location);
-		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE)).thenReturn(activeCount);
-
+		when(schedule.getId()).thenReturn(scheduleId);
+		when(tokenRepository.findTokenLocation(scheduleId, uuid)).thenReturn(1L);
 		// act
-		TokenLocationInfo info = tokenService.getTokenLocation(new TokenLocationCommand(uuid));
+
+		TokenLocationInfo info = tokenService.getTokenLocation(command);
 
 		// assert
-		assertThat(info).isNotNull();
-		assertThat(info.getStatus()).isEqualTo("ACTIVE");
+
+		assertThat(info.getLocation()).isEqualTo(1L);
 		assertThat(info.getScheduleId()).isEqualTo(scheduleId);
-		assertThat(info.getLocation()).isEqualTo(location);
+		assertThat(info.getStatus()).isEqualTo(TokenStatus.PENDING.toString());
+	}
+
+	@Test
+	@DisplayName("조회한 토큰의 상태가 ACTIVE이면 location은 1을 반환한다.")
+	void getTokenLocation_active_성공() {
+		// arrange
+		String uuid = "uuid_1";
+		Long scheduleId = 1L;
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, uuid, TokenStatus.ACTIVE);
+		TokenLocationCommand command = new TokenLocationCommand(uuid);
+
+		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
+		when(schedule.getId()).thenReturn(scheduleId);
+		when(tokenRepository.findTokenLocation(scheduleId, uuid)).thenReturn(2L);
+		// act
+
+		TokenLocationInfo info = tokenService.getTokenLocation(command);
+
+		// assert
+
+		assertThat(info.getLocation()).isEqualTo(1L);
+		assertThat(info.getScheduleId()).isEqualTo(scheduleId);
+		assertThat(info.getStatus()).isEqualTo(TokenStatus.ACTIVE.toString());
 	}
 
 	@Test
@@ -140,30 +161,5 @@ class TokenServiceTest {
 		// act & assert
 		assertThatThrownBy(() -> tokenService.getTokenLocation(new TokenLocationCommand(uuid)))
 			.isInstanceOf(BusinessException.class);
-	}
-
-	@Test
-	@DisplayName("location이 1이 아니거나 activeCount가 최대이면 상태를 변경하지 않는다")
-	void getTokenLocation_조건불충족_상태변경안함() {
-		// arrange
-		String uuid = "uuid-5678";
-		Long scheduleId = 1L;
-		Long location = 2L;
-		Long activeCount = 1000L;
-
-		Schedule schedule = mock(Schedule.class);
-		when(schedule.getId()).thenReturn(scheduleId);
-
-		Token token = Token.create(new User("user", "pass"), schedule, uuid, TokenStatus.PENDING);
-
-		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
-		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(location);
-		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE)).thenReturn(activeCount);
-
-		// act
-		TokenLocationInfo info = tokenService.getTokenLocation(new TokenLocationCommand(uuid));
-
-		// assert
-		assertThat(info.getStatus()).isEqualTo("PENDING");
 	}
 }

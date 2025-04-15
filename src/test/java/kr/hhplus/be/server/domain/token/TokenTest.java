@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.token;
 
+import static kr.hhplus.be.server.domain.token.TokenStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -21,7 +22,7 @@ class TokenTest {
 		Concert concert = new Concert("락페스티벌");
 		Schedule schedule = new Schedule(concert, LocalDate.now());
 		String uuid = "123e4567-e89b-12d3-a456-426614174000";
-		TokenStatus status = TokenStatus.ACTIVE;
+		TokenStatus status = ACTIVE;
 
 		// act
 		Token token = Token.create(user, schedule, uuid, status);
@@ -39,13 +40,13 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
-		Token token = Token.create(user, schedule, "uuid-1", TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, "uuid-1", PENDING);
 
 		// act
-		token.activateIfFirstAndAvailable(1L, 500L);
+		token.activate(1L, 500L);
 
 		// assert
-		assertThat(token.getStatus()).isEqualTo(TokenStatus.ACTIVE);
+		assertThat(token.getStatus()).isEqualTo(ACTIVE);
 	}
 
 	@Test
@@ -54,13 +55,13 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
-		Token token = Token.create(user, schedule, "uuid-2", TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, "uuid-2", PENDING);
 
 		// act
-		token.activateIfFirstAndAvailable(2L, 500L);
+		token.activate(2L, 500L);
 
 		// assert
-		assertThat(token.getStatus()).isEqualTo(TokenStatus.PENDING);
+		assertThat(token.getStatus()).isEqualTo(PENDING);
 	}
 
 	@Test
@@ -69,12 +70,36 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
-		Token token = Token.create(user, schedule, "uuid-3", TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, "uuid-3", PENDING);
 
 		// act
-		token.activateIfFirstAndAvailable(1L, 1000L);
+		token.activate(1L, 1000L);
 
 		// assert
-		assertThat(token.getStatus()).isEqualTo(TokenStatus.PENDING);
+		assertThat(token.getStatus()).isEqualTo(PENDING);
+	}
+
+	@Test
+	@DisplayName("PENDING 상태의 토큰에서 isActive를 호출하면 false를 리턴한다")
+	void isActiveFalse() {
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		String uuid = "uuid_1";
+		Token token = Token.create(user, schedule, uuid, PENDING);
+		boolean active = token.isActive();
+
+		assertThat(active).isFalse();
+	}
+
+	@Test
+	@DisplayName("ACTIVE 상태의 토큰에서 isActive를 호출하면 true를 리턴한다")
+	void isActiveTrue() {
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		String uuid = "uuid_1";
+		Token token = Token.create(user, schedule, uuid, ACTIVE);
+		boolean active = token.isActive();
+
+		assertThat(active).isTrue();
 	}
 }

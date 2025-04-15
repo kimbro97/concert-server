@@ -2,7 +2,6 @@ package kr.hhplus.be.server.service.token;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.token.TokenStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
-import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -51,11 +49,11 @@ public class TokenService {
 
 		Long scheduleId = token.getSchedule().getId();
 
-		Long location = tokenRepository.findTokenLocation(scheduleId, command.getUuid(), TokenStatus.PENDING);
+		Long location = tokenRepository.findTokenLocation(scheduleId, command.getUuid());
 
-		Long activeCount = tokenRepository.countByScheduleIdAndStatus(scheduleId, TokenStatus.ACTIVE);
-
-		token.activateIfFirstAndAvailable(location, activeCount);
+		if (token.isActive()) {
+			location = 1L;
+		}
 
 		return new TokenLocationInfo(scheduleId, location, token.getStatus());
 	}

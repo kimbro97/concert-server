@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.token;
 
 import static lombok.AccessLevel.*;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,12 +46,15 @@ public class Token extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private TokenStatus status;
 
+	private LocalDateTime expireAt;
+
 	@Builder
-	private Token(User user, Schedule schedule, String uuid, TokenStatus status) {
+	private Token(User user, Schedule schedule, String uuid, TokenStatus status, LocalDateTime expireAt) {
 		this.user = user;
 		this.schedule = schedule;
 		this.uuid = uuid;
 		this.status = status;
+		this.expireAt = expireAt;
 	}
 
 	public static Token create(User user, Schedule schedule, String uuid, TokenStatus status) {
@@ -58,10 +63,15 @@ public class Token extends BaseEntity {
 			.schedule(schedule)
 			.uuid(uuid)
 			.status(status)
+			.expireAt(null)
 			.build();
 	}
 
-	public void activateIfFirstAndAvailable(Long location, Long activeCount) {
+	public boolean isActive() {
+		return status == TokenStatus.ACTIVE;
+	}
+
+	public void activate(Long location, Long activeCount) {
 		if (location == 1L && activeCount < MAX_ACTIVE) {
 			this.status = TokenStatus.ACTIVE;
 		}
