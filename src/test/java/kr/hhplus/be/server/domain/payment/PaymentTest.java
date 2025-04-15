@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.support.exception.BusinessException;
@@ -19,11 +20,12 @@ class PaymentTest {
 		// arrange
 		User user = new User("test", "1234");
 		Reservation reservation = mock(Reservation.class);
+		Balance balance = new Balance(user, 10000L);
 		Payment payment = Payment.create(user, reservation);
 		LocalDateTime now = LocalDateTime.now();
 
 		// act
-		payment.pay(now);
+		payment.pay(balance, now);
 
 		// assert
 		assertThat(payment.getStatus()).isEqualTo(PaymentStatus.PAID);
@@ -38,6 +40,7 @@ class PaymentTest {
 		// arrange
 		User user = new User("test", "1234");
 		Reservation reservation = mock(Reservation.class);
+		Balance balance = new Balance(user, 10000L);
 		Payment payment = Payment.create(user, reservation);
 		LocalDateTime now = LocalDateTime.now();
 
@@ -45,7 +48,7 @@ class PaymentTest {
 			.when(reservation).validateNotExpired(now);
 
 		// act & assert
-		assertThatThrownBy(() -> payment.pay(now))
+		assertThatThrownBy(() -> payment.pay(balance, now))
 			.isInstanceOf(BusinessException.class)
 			.hasMessageContaining("예약이 만료되었습니다");
 

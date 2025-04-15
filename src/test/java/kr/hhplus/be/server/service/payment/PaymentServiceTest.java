@@ -43,7 +43,6 @@ class PaymentServiceTest {
 		Long userId = 1L;
 		Long reservationId = 10L;
 		Long totalAmount = 20000L;
-		LocalDateTime now = LocalDateTime.now();
 
 		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
 
@@ -58,12 +57,8 @@ class PaymentServiceTest {
 		when(reservation.getTotalAmount()).thenReturn(totalAmount);
 		when(reservation.getId()).thenReturn(reservationId);
 
-		// 결제 생성
-		Payment payment = Payment.create(user, reservation);
-		payment.pay(now);
-
 		// 저장 시 반환 객체 설정
-		when(paymentRepository.save(any())).thenReturn(payment);
+		when(paymentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
 		// act
 		PaymentInfo result = paymentService.pay(command);

@@ -75,6 +75,7 @@ public class Reservation extends BaseEntity {
 	}
 
 	public void cancel() {
+		cancelValidate();
 		this.status = ReservationStatus.CANCEL;
 		this.seat.cancel();
 	}
@@ -85,5 +86,11 @@ public class Reservation extends BaseEntity {
 			.schedule(schedule)
 			.seat(seat)
 			.build();
+	}
+
+	private void cancelValidate() {
+		if (this.status == ReservationStatus.CANCEL) {
+			throw BusinessError.ALREADY_RESERVED_CANCEL_ERROR.exception();
+		}
 	}
 }

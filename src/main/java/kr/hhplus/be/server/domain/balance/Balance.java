@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.balance;
 
 import static jakarta.persistence.GenerationType.*;
+import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static lombok.AccessLevel.*;
 
 import jakarta.persistence.Column;
@@ -39,6 +40,14 @@ public class Balance extends BaseEntity {
 	}
 
 	public void use(Long amount) {
+		useValidate(amount);
 		this.amount = this.amount - amount;
 	}
+
+	private void useValidate(Long amount) {
+		if (amount > this.amount) {
+			throw NOT_ENOUGH_POINT_ERROR.exception();
+		}
+	}
+
 }
