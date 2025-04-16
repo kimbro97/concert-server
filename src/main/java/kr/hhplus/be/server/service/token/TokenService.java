@@ -70,13 +70,23 @@ public class TokenService {
 		for (Schedule schedule : schedules) {
 			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusOrderByCreatedAtAsc(
 				schedule.getId(), PENDING);
-			Long activeCount = tokenRepository.countByScheduleIdAndStatus(schedule.getId(), TokenStatus.ACTIVE);
+			Long activeCount = tokenRepository.countByScheduleIdAndStatus(schedule.getId(), ACTIVE);
 
 			if (!tokens.isEmpty() && activeCount < 1000) {
 				Token first = tokens.get(0);
 				first.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
 				tokenRepository.save(first);
 			}
+		}
+	}
+
+	public void expireToken() {
+		List<Schedule> schedules = concertRepository.findAllSchedule();
+
+		for (Schedule schedule : schedules) {
+			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusAndExpireAtBefore(schedule, ACTIVE,
+				LocalDateTime.now());
+			tokenRepository.deleteAll(tokens);
 		}
 	}
 }

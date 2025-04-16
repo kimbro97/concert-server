@@ -1,7 +1,10 @@
 package kr.hhplus.be.server.domain.token;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import kr.hhplus.be.server.domain.concert.Schedule;
 
 public interface TokenRepository {
 
@@ -16,4 +19,8 @@ public interface TokenRepository {
 	void deleteByUuid(String uuid);
 
 	List<Token> findAllByScheduleIdAndStatusOrderByCreatedAtAsc(Long scheduleId, TokenStatus tokenStatus);
+
+	List<Token> findAllByScheduleIdAndStatusAndExpireAtBefore(Schedule schedule, TokenStatus tokenStatus, LocalDateTime now);
+
+	void deleteAll(List<Token> tokens);
 }

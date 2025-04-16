@@ -16,4 +16,9 @@ public class TokenScheduler {
 	public void activateToken() {
 		tokenService.activateToken();
 	}
+
+	@Scheduled(fixedRate = 10000)
+	public void expireToken() {
+		tokenService.expireToken();
+	}
 }
