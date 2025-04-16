@@ -21,6 +21,7 @@ import kr.hhplus.be.server.domain.payment.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.PaymentStatus;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.reservation.ReservationRepository;
+import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
 import kr.hhplus.be.server.support.exception.BusinessException;
@@ -31,6 +32,7 @@ class PaymentServiceTest {
 	@Mock ReservationRepository reservationRepository;
 	@Mock BalanceRepository balanceRepository;
 	@Mock PaymentRepository paymentRepository;
+	@Mock TokenRepository tokenRepository;
 
 	@InjectMocks PaymentService paymentService;
 
@@ -41,9 +43,8 @@ class PaymentServiceTest {
 		Long userId = 1L;
 		Long reservationId = 10L;
 		Long totalAmount = 20000L;
-		LocalDateTime now = LocalDateTime.now();
 
-		PaymentCommand command = new PaymentCommand(userId, reservationId);
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
 
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);
@@ -56,12 +57,8 @@ class PaymentServiceTest {
 		when(reservation.getTotalAmount()).thenReturn(totalAmount);
 		when(reservation.getId()).thenReturn(reservationId);
 
-		// 결제 생성
-		Payment payment = Payment.create(user, reservation);
-		payment.pay(now);
-
 		// 저장 시 반환 객체 설정
-		when(paymentRepository.save(any())).thenReturn(payment);
+		when(paymentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
 		// act
 		PaymentInfo result = paymentService.pay(command);
@@ -72,6 +69,7 @@ class PaymentServiceTest {
 		assertThat(result.getPaidAt()).isNotNull();
 
 		verify(balance).use(totalAmount);
+		verify(tokenRepository).deleteByUuid("uuid_1");
 		verify(paymentRepository).save(any(Payment.class));
 		verify(balanceRepository).save(balance);
 	}
@@ -82,7 +80,7 @@ class PaymentServiceTest {
 	void pay_유저없음() {
 		// arrange
 		Long userId = 1L;
-		PaymentCommand command = new PaymentCommand(userId, 1L);
+		PaymentCommand command = new PaymentCommand(userId, 1L, "uuid_1");
 
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -100,7 +98,7 @@ class PaymentServiceTest {
 		// arrange
 		Long userId = 1L;
 		Long reservationId = 100L;
-		PaymentCommand command = new PaymentCommand(userId, reservationId);
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(new User("kim", "1234")));
 		when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
@@ -119,7 +117,7 @@ class PaymentServiceTest {
 		// arrange
 		Long userId = 1L;
 		Long reservationId = 100L;
-		PaymentCommand command = new PaymentCommand(userId, reservationId);
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
 
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);

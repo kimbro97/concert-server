@@ -13,6 +13,7 @@ import kr.hhplus.be.server.domain.payment.Payment;
 import kr.hhplus.be.server.domain.payment.PaymentRepository;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.reservation.ReservationRepository;
+import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentService {
 
 	private final UserRepository userRepository;
+	private final TokenRepository tokenRepository;
 	private final PaymentRepository paymentRepository;
 	private final BalanceRepository balanceRepository;
 	private final ReservationRepository reservationRepository;
@@ -38,11 +40,10 @@ public class PaymentService {
 		Balance balance = balanceRepository.findByUserId(command.getUserId())
 			.orElseThrow(NOT_FOUND_BALANCE_ERROR::exception);
 
-		balance.use(reservation.getTotalAmount());
-
 		Payment payment = Payment.create(user, reservation);
-		payment.pay(LocalDateTime.now());
+		payment.pay(balance, LocalDateTime.now());
 
+		tokenRepository.deleteByUuid(command.getUuid());
 		paymentRepository.save(payment);
 		balanceRepository.save(balance);
 

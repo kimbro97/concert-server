@@ -12,4 +12,5 @@ public interface ConcertRepository {
 	List<Seat> findAllSeatByScheduleId(Long scheduleId);
 	List<Schedule> findAllByConcertIdAndDateBetween(Long concertId, LocalDate startDate, LocalDate endDate);
 
+	List<Schedule> findAllSchedule();
 }

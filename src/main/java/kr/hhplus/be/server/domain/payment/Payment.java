@@ -14,10 +14,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import kr.hhplus.be.server.domain.BaseEntity;
+import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.user.User;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,23 +45,26 @@ public class Payment extends BaseEntity {
 
 	private LocalDateTime paidAt;
 
-
-	@Builder
 	private Payment(User user, Reservation reservation) {
 		this.user = user;
 		this.reservation = reservation;
 	}
 
 	public static Payment create(User user, Reservation reservation) {
-		return Payment.builder()
-			.user(user)
-			.reservation(reservation)
-			.build();
+		return new Payment(user, reservation);
 	}
 
-	public void pay(LocalDateTime now) {
+	public void pay(Balance balance, LocalDateTime now) {
+		this.payValidate();
 		reservation.validateNotExpired(now);
+		balance.use(reservation.getTotalAmount());
 		this.status = PaymentStatus.PAID;
 		this.paidAt = now;
+	}
+
+	private void payValidate() {
+		if (this.status == PaymentStatus.PAID) {
+			throw BusinessError.ALREADY_PAID_ERROR.exception();
+		}
 	}
 }
