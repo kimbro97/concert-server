@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.token;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TokenRepository {
@@ -13,4 +14,6 @@ public interface TokenRepository {
 	Long countByScheduleIdAndStatus(Long scheduleId, TokenStatus status);
 
 	void deleteByUuid(String uuid);
+
+	List<Token> findAllByScheduleIdAndStatusOrderByCreatedAtAsc(Long scheduleId, TokenStatus tokenStatus);
 }

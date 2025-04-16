@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,13 +41,15 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
+		LocalDateTime now = LocalDateTime.now();
 		Token token = Token.create(user, schedule, "uuid-1", PENDING);
 
 		// act
-		token.activate(1L, 500L);
+		token.activate(1L, 500L, now.plusMinutes(10));
 
 		// assert
 		assertThat(token.getStatus()).isEqualTo(ACTIVE);
+		assertThat(token.getExpireAt()).isEqualTo(now.plusMinutes(10));
 	}
 
 	@Test
@@ -55,10 +58,11 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
+		LocalDateTime now = LocalDateTime.now();
 		Token token = Token.create(user, schedule, "uuid-2", PENDING);
 
 		// act
-		token.activate(2L, 500L);
+		token.activate(2L, 500L, now.plusMinutes(10));
 
 		// assert
 		assertThat(token.getStatus()).isEqualTo(PENDING);
@@ -70,10 +74,11 @@ class TokenTest {
 		// arrange
 		User user = new User("kimbro", "1234");
 		Schedule schedule = mock(Schedule.class);
+		LocalDateTime now = LocalDateTime.now();
 		Token token = Token.create(user, schedule, "uuid-3", PENDING);
 
 		// act
-		token.activate(1L, 1000L);
+		token.activate(1L, 1000L, now.plusMinutes(10));
 
 		// assert
 		assertThat(token.getStatus()).isEqualTo(PENDING);

@@ -1,9 +1,11 @@
 package kr.hhplus.be.server.service.token;
 
+import static kr.hhplus.be.server.domain.token.TokenStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +50,7 @@ class TokenServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(concertRepository.findScheduleById(scheduleId)).thenReturn(Optional.of(schedule));
 
-		Token mockToken = Token.create(user, schedule, "uuid-123", TokenStatus.PENDING);
+		Token mockToken = Token.create(user, schedule, "uuid-123", PENDING);
 		when(tokenRepository.save(any(Token.class))).thenReturn(mockToken);
 
 		// act
@@ -109,12 +111,12 @@ class TokenServiceTest {
 		Long scheduleId = 1L;
 		User user = mock(User.class);
 		Schedule schedule = mock(Schedule.class);
-		Token token = Token.create(user, schedule, uuid, TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, uuid, PENDING);
 		TokenLocationCommand command = new TokenLocationCommand(uuid);
 
 		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
 		when(schedule.getId()).thenReturn(scheduleId);
-		when(tokenRepository.findTokenLocation(scheduleId, uuid, TokenStatus.PENDING)).thenReturn(1L);
+		when(tokenRepository.findTokenLocation(scheduleId, uuid, PENDING)).thenReturn(1L);
 		// act
 
 		TokenLocationInfo info = tokenService.getTokenLocation(command);
@@ -123,7 +125,7 @@ class TokenServiceTest {
 
 		assertThat(info.getLocation()).isEqualTo(1L);
 		assertThat(info.getScheduleId()).isEqualTo(scheduleId);
-		assertThat(info.getStatus()).isEqualTo(TokenStatus.PENDING.toString());
+		assertThat(info.getStatus()).isEqualTo(PENDING.toString());
 	}
 
 	@Test
@@ -134,7 +136,7 @@ class TokenServiceTest {
 		Long scheduleId = 1L;
 		User user = mock(User.class);
 		Schedule schedule = mock(Schedule.class);
-		Token token = Token.create(user, schedule, uuid, TokenStatus.ACTIVE);
+		Token token = Token.create(user, schedule, uuid, ACTIVE);
 		TokenLocationCommand command = new TokenLocationCommand(uuid);
 
 		when(tokenRepository.findByUuid(uuid)).thenReturn(Optional.of(token));
@@ -147,7 +149,7 @@ class TokenServiceTest {
 
 		assertThat(info.getLocation()).isEqualTo(1L);
 		assertThat(info.getScheduleId()).isEqualTo(scheduleId);
-		assertThat(info.getStatus()).isEqualTo(TokenStatus.ACTIVE.toString());
+		assertThat(info.getStatus()).isEqualTo(ACTIVE.toString());
 	}
 
 	@Test
@@ -160,5 +162,52 @@ class TokenServiceTest {
 		// act & assert
 		assertThatThrownBy(() -> tokenService.getTokenLocation(new TokenLocationCommand(uuid)))
 			.isInstanceOf(BusinessException.class);
+	}
+
+	@Test
+	@DisplayName("PENDING 토큰이 있고 ACTIVE 토큰 수가 1000보다 작으면 첫 토큰을 활성화한다")
+	void activateToken_성공() {
+		// arrange
+		String uuid = "uuid_1";
+		Long scheduleId = 1L;
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, uuid, PENDING);
+		List<Schedule> schedules = List.of(schedule);
+		List<Token> tokens = List.of(token);
+
+		when(concertRepository.findAllSchedule()).thenReturn(schedules);
+		when(schedule.getId()).thenReturn(scheduleId);
+		when(tokenRepository.findAllByScheduleIdAndStatusOrderByCreatedAtAsc(scheduleId, PENDING)).thenReturn(tokens);
+		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, ACTIVE)).thenReturn(999L);
+
+		// act
+		tokenService.activateToken();
+
+		assertThat(token.getStatus()).isEqualTo(ACTIVE);
+
+	}
+
+	@Test
+	@DisplayName("ACTIVE 토큰 수가 1000 이상이면 토큰을 활성화하지 않는다")
+	void activateToken_활성화제한() {
+		// arrange
+		String uuid = "uuid_1";
+		Long scheduleId = 1L;
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Token token = Token.create(user, schedule, uuid, PENDING);
+		List<Schedule> schedules = List.of(schedule);
+		List<Token> tokens = List.of(token);
+
+		when(concertRepository.findAllSchedule()).thenReturn(schedules);
+		when(schedule.getId()).thenReturn(scheduleId);
+		when(tokenRepository.findAllByScheduleIdAndStatusOrderByCreatedAtAsc(scheduleId, PENDING)).thenReturn(tokens);
+		when(tokenRepository.countByScheduleIdAndStatus(scheduleId, ACTIVE)).thenReturn(1001L);
+
+		// act
+		tokenService.activateToken();
+
+		assertThat(token.getStatus()).isEqualTo(PENDING);
 	}
 }

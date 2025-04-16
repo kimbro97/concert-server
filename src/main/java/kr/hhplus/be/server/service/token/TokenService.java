@@ -1,7 +1,10 @@
 package kr.hhplus.be.server.service.token;
 
+import static kr.hhplus.be.server.domain.token.TokenStatus.*;
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +37,7 @@ public class TokenService {
 			.orElseThrow(NOT_FOUND_SCHEDULE_ERROR::exception);
 
 		String uuid = UUID.randomUUID().toString().replace("-", "");
-		Token token = Token.create(user, schedule, uuid, TokenStatus.PENDING);
+		Token token = Token.create(user, schedule, uuid, PENDING);
 
 		Token savedToken = tokenRepository.save(token);
 
@@ -55,8 +58,25 @@ public class TokenService {
 			return new TokenLocationInfo(scheduleId, location, token.getStatus());
 		}
 
-		location = tokenRepository.findTokenLocation(scheduleId, command.getUuid(), TokenStatus.PENDING);
+		location = tokenRepository.findTokenLocation(scheduleId, command.getUuid(), PENDING);
 
 		return new TokenLocationInfo(scheduleId, location, token.getStatus());
+	}
+
+	@Transactional
+	public void activateToken() {
+		List<Schedule> schedules = concertRepository.findAllSchedule();
+
+		for (Schedule schedule : schedules) {
+			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusOrderByCreatedAtAsc(
+				schedule.getId(), PENDING);
+			Long activeCount = tokenRepository.countByScheduleIdAndStatus(schedule.getId(), TokenStatus.ACTIVE);
+
+			if (!tokens.isEmpty() && activeCount < 1000) {
+				Token first = tokens.get(0);
+				first.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
+				tokenRepository.save(first);
+			}
+		}
 	}
 }

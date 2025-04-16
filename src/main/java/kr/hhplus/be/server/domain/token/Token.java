@@ -71,9 +71,10 @@ public class Token extends BaseEntity {
 		return status == TokenStatus.ACTIVE;
 	}
 
-	public void activate(Long location, Long activeCount) {
+	public void activate(Long location, Long activeCount, LocalDateTime expireAt) {
 		if (location == 1L && activeCount < MAX_ACTIVE) {
 			this.status = TokenStatus.ACTIVE;
+			this.expireAt = expireAt;
 		}
 	}
 }
