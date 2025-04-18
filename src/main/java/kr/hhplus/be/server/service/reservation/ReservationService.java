@@ -48,8 +48,8 @@ public class ReservationService {
 	}
 
 	@Transactional
-	public void cancel() {
-		List<Reservation> reservations = reservationRepository.findAllByStatusAndExpiredAtBefore(ReservationStatus.RESERVED, LocalDateTime.now());
+	public void cancel(LocalDateTime now) {
+		List<Reservation> reservations = reservationRepository.findAllByStatusAndExpiredAtBefore(ReservationStatus.RESERVED, now);
 
 		for (Reservation reservation : reservations) {
 			reservation.cancel();

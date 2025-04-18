@@ -44,7 +44,7 @@ class PaymentServiceTest {
 		Long reservationId = 10L;
 		Long totalAmount = 20000L;
 
-		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1", LocalDateTime.now());
 
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);
@@ -80,7 +80,7 @@ class PaymentServiceTest {
 	void pay_유저없음() {
 		// arrange
 		Long userId = 1L;
-		PaymentCommand command = new PaymentCommand(userId, 1L, "uuid_1");
+		PaymentCommand command = new PaymentCommand(userId, 1L, "uuid_1", LocalDateTime.now());
 
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -98,7 +98,7 @@ class PaymentServiceTest {
 		// arrange
 		Long userId = 1L;
 		Long reservationId = 100L;
-		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1", LocalDateTime.now());
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(new User("kim", "1234")));
 		when(reservationRepository.findById(reservationId)).thenReturn(Optional.empty());
@@ -117,7 +117,7 @@ class PaymentServiceTest {
 		// arrange
 		Long userId = 1L;
 		Long reservationId = 100L;
-		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1");
+		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1", LocalDateTime.now());
 
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);

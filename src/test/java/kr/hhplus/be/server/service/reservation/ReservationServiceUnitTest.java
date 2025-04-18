@@ -134,7 +134,7 @@ class ReservationServiceUnitTest {
 		)).thenReturn(List.of(reservation1, reservation2));
 
 		// act
-		reservationService.cancel();
+		reservationService.cancel(LocalDateTime.now());
 
 		// assert
 		verify(reservation1).cancel();

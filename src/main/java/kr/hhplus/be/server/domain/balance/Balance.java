@@ -5,7 +5,9 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static lombok.AccessLevel.*;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -25,7 +27,7 @@ public class Balance extends BaseEntity {
 	private Long id;
 
 	@OneToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User user;
 
 	private Long amount;

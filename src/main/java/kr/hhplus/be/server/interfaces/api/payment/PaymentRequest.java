@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.interfaces.api.payment;
 
+import java.time.LocalDateTime;
+
 import kr.hhplus.be.server.service.payment.PaymentCommand;
 import lombok.Getter;
 
@@ -14,6 +16,6 @@ public class PaymentRequest {
 	}
 
 	public PaymentCommand toCommand(String uuid) {
-		return new PaymentCommand(userId, reservationId, uuid);
+		return new PaymentCommand(userId, reservationId, uuid, LocalDateTime.now());
 	}
 }

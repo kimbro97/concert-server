@@ -14,7 +14,6 @@ import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.token.Token;
 import kr.hhplus.be.server.domain.token.TokenRepository;
-import kr.hhplus.be.server.domain.token.TokenStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class TokenService {
 		return TokenInfo.from(savedToken);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public TokenLocationInfo getTokenLocation(TokenLocationCommand command) {
 
 		Long location = 1L;
@@ -80,12 +79,13 @@ public class TokenService {
 		}
 	}
 
-	public void expireToken() {
+	@Transactional
+	public void expireToken(LocalDateTime now) {
 		List<Schedule> schedules = concertRepository.findAllSchedule();
 
 		for (Schedule schedule : schedules) {
 			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusAndExpireAtBefore(schedule, ACTIVE,
-				LocalDateTime.now());
+				now);
 			tokenRepository.deleteAll(tokens);
 		}
 	}
