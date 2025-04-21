@@ -41,7 +41,7 @@ public class PaymentService {
 			.orElseThrow(NOT_FOUND_BALANCE_ERROR::exception);
 
 		Payment payment = Payment.create(user, reservation);
-		payment.pay(balance, LocalDateTime.now());
+		payment.pay(balance, command.getNow());
 
 		tokenRepository.deleteByUuid(command.getUuid());
 		paymentRepository.save(payment);

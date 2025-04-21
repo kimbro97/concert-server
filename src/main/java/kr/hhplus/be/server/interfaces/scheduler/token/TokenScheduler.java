@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.interfaces.scheduler.token;
 
+import java.time.LocalDateTime;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,6 @@ public class TokenScheduler {
 
 	@Scheduled(fixedRate = 10000)
 	public void expireToken() {
-		tokenService.expireToken();
+		tokenService.expireToken(LocalDateTime.now());
 	}
 }

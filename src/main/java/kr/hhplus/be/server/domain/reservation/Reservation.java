@@ -2,14 +2,17 @@ package kr.hhplus.be.server.domain.reservation;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.*;
+import static kr.hhplus.be.server.domain.reservation.ReservationStatus.*;
 import static lombok.AccessLevel.*;
 
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -35,15 +38,15 @@ public class Reservation extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private User user;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seat_id")
+	@JoinColumn(name = "seat_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Seat seat;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "schedule_id")
+	@JoinColumn(name = "schedule_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Schedule schedule;
 
 	private Long totalAmount;
@@ -63,7 +66,7 @@ public class Reservation extends BaseEntity {
 	public void reserve(LocalDateTime expiredAt) {
 		seat.reserve();
 		this.totalAmount = seat.calculatePrice();
-		this.status = ReservationStatus.RESERVED;
+		this.status = RESERVED;
 		this.expiredAt = expiredAt;
 	}
 
@@ -71,12 +74,12 @@ public class Reservation extends BaseEntity {
 		if (this.expiredAt.isBefore(now)) {
 			throw BusinessError.EXPIRED_RESERVATION_ERROR.exception();
 		}
-		this.status = ReservationStatus.CONFIRMED;
+		this.status = CONFIRMED;
 	}
 
 	public void cancel() {
 		cancelValidate();
-		this.status = ReservationStatus.CANCEL;
+		this.status = CANCEL;
 		this.seat.cancel();
 	}
 
@@ -89,8 +92,11 @@ public class Reservation extends BaseEntity {
 	}
 
 	private void cancelValidate() {
-		if (this.status == ReservationStatus.CANCEL) {
+		if (this.status == CANCEL) {
 			throw BusinessError.ALREADY_RESERVED_CANCEL_ERROR.exception();
+		}
+		if (this.status == CONFIRMED) {
+			throw BusinessError.CONFIRMED_RESERVED_CANCEL_ERROR.exception();
 		}
 	}
 }
