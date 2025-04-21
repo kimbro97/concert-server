@@ -27,11 +27,20 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 class TokenServiceIntegrationTest {
 
-	@Autowired TokenService tokenService;
-	@Autowired UserJpaRepository userJpaRepository;
-	@Autowired ConcertJpaRepository concertJpaRepository;
-	@Autowired ScheduleJpaRepository scheduleJpaRepository;
-	@Autowired TokenJpaRepository tokenJpaRepository;
+	@Autowired
+	private TokenService tokenService;
+
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+
+	@Autowired
+	private ConcertJpaRepository concertJpaRepository;
+
+	@Autowired
+	private ScheduleJpaRepository scheduleJpaRepository;
+
+	@Autowired
+	private TokenJpaRepository tokenJpaRepository;
 
 	@Test
 	@DisplayName("토큰 생성시 유저가 존재하지 않으면 예외가 발생한다.")

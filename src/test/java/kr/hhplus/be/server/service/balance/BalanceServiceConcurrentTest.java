@@ -19,10 +19,14 @@ import kr.hhplus.be.server.domain.user.UserRepository;
 @SpringBootTest
 class BalanceServiceConcurrentTest {
 
-	@Autowired private UserRepository userRepository;
-	@Autowired private BalanceRepository balanceRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-	@Autowired private BalanceService balanceService;
+	@Autowired
+	private BalanceRepository balanceRepository;
+
+	@Autowired
+	private BalanceService balanceService;
 
 	@Test
 	@DisplayName("한 명의 회원이 여러 번 동시에 잔액을 충전해도 최종 금액이 정확해야 한다")

@@ -28,12 +28,23 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 public class ReservationServiceConcurrentTests {
 
-	@Autowired UserJpaRepository userJpaRepository;
-	@Autowired SeatJpaRepository seatJpaRepository;
-	@Autowired ReservationService reservationService;
-	@Autowired ConcertJpaRepository concertJpaRepository;
-	@Autowired ScheduleJpaRepository scheduleJpaRepository;
-	@Autowired ReservationJpaRepository reservationJpaRepository;
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+
+	@Autowired
+	private SeatJpaRepository seatJpaRepository;
+
+	@Autowired
+	private ReservationService reservationService;
+
+	@Autowired
+	private ConcertJpaRepository concertJpaRepository;
+
+	@Autowired
+	private ScheduleJpaRepository scheduleJpaRepository;
+
+	@Autowired
+	private ReservationJpaRepository reservationJpaRepository;
 
 	@Test
 	@DisplayName("동시에 좌석 예약을 시도하면 하나만 성공해야한다.")

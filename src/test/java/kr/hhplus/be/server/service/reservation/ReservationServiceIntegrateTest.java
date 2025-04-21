@@ -29,12 +29,23 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 class ReservationServiceIntegrateTest {
 
-	@Autowired UserJpaRepository userJpaRepository;
-	@Autowired SeatJpaRepository seatJpaRepository;
-	@Autowired ReservationService reservationService;
-	@Autowired ConcertJpaRepository concertJpaRepository;
-	@Autowired ScheduleJpaRepository scheduleJpaRepository;
-	@Autowired ReservationJpaRepository reservationJpaRepository;
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+
+	@Autowired
+	private SeatJpaRepository seatJpaRepository;
+
+	@Autowired
+	private ReservationService reservationService;
+
+	@Autowired
+	private ConcertJpaRepository concertJpaRepository;
+
+	@Autowired
+	private ScheduleJpaRepository scheduleJpaRepository;
+
+	@Autowired
+	private ReservationJpaRepository reservationJpaRepository;
 
 	@Test
 	@DisplayName("예약시 존재하지 않은 유저이면 예외가 발생한다.")

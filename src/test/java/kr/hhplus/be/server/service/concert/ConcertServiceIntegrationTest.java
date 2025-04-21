@@ -24,11 +24,20 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 class ConcertServiceIntegrationTest {
 
-	@Autowired ConcertService concertService;
-	@Autowired SeatJpaRepository seatJpaRepository;
-	@Autowired UserJpaRepository userJpaRepository;
-	@Autowired ConcertJpaRepository concertJpaRepository;
-	@Autowired ScheduleJpaRepository scheduleJpaRepository;
+	@Autowired
+	private ConcertService concertService;
+
+	@Autowired
+	private SeatJpaRepository seatJpaRepository;
+
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+
+	@Autowired
+	private ConcertJpaRepository concertJpaRepository;
+
+	@Autowired
+	private ScheduleJpaRepository scheduleJpaRepository;
 
 	@Test
 	@DisplayName("스케줄 조회시 존재하지 않는 콘서트면 예외가 발생한다")
