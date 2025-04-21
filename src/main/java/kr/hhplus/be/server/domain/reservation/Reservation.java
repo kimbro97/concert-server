@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.reservation;
 
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.*;
+import static kr.hhplus.be.server.domain.reservation.ReservationStatus.*;
 import static lombok.AccessLevel.*;
 
 import java.time.LocalDateTime;
@@ -65,7 +66,7 @@ public class Reservation extends BaseEntity {
 	public void reserve(LocalDateTime expiredAt) {
 		seat.reserve();
 		this.totalAmount = seat.calculatePrice();
-		this.status = ReservationStatus.RESERVED;
+		this.status = RESERVED;
 		this.expiredAt = expiredAt;
 	}
 
@@ -73,12 +74,12 @@ public class Reservation extends BaseEntity {
 		if (this.expiredAt.isBefore(now)) {
 			throw BusinessError.EXPIRED_RESERVATION_ERROR.exception();
 		}
-		this.status = ReservationStatus.CONFIRMED;
+		this.status = CONFIRMED;
 	}
 
 	public void cancel() {
 		cancelValidate();
-		this.status = ReservationStatus.CANCEL;
+		this.status = CANCEL;
 		this.seat.cancel();
 	}
 
@@ -91,8 +92,11 @@ public class Reservation extends BaseEntity {
 	}
 
 	private void cancelValidate() {
-		if (this.status == ReservationStatus.CANCEL) {
+		if (this.status == CANCEL) {
 			throw BusinessError.ALREADY_RESERVED_CANCEL_ERROR.exception();
+		}
+		if (this.status == CONFIRMED) {
+			throw BusinessError.CONFIRMED_RESERVED_CANCEL_ERROR.exception();
 		}
 	}
 }

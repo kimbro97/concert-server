@@ -18,10 +18,14 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 class BalanceServiceIntegrationTest {
 
-	@Autowired private UserRepository userRepository;
-	@Autowired private BalanceRepository balanceRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-	@Autowired private BalanceService balanceService;
+	@Autowired
+	private BalanceRepository balanceRepository;
+
+	@Autowired
+	private BalanceService balanceService;
 
 	@Test
 	@DisplayName("존재하지 않은 userId로 조회시 예외가 발생한다.")

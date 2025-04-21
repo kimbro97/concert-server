@@ -35,15 +35,32 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 @SpringBootTest
 class PaymentServiceIntegrationTest {
 
-	@Autowired PaymentService paymentService;
-	@Autowired UserJpaRepository userJpaRepository;
-	@Autowired SeatJpaRepository seatJpaRepository;
-	@Autowired TokenJpaRepository tokenJpaRepository;
-	@Autowired ConcertJpaRepository concertJpaRepository;
-	@Autowired BalanceJpaRepository balanceJpaRepository;
-	@Autowired PaymentJpaRepository paymentJpaRepository;
-	@Autowired ScheduleJpaRepository scheduleJpaRepository;
-	@Autowired ReservationJpaRepository reservationJpaRepository;
+	@Autowired
+	private PaymentService paymentService;
+
+	@Autowired
+	private UserJpaRepository userJpaRepository;
+
+	@Autowired
+	private SeatJpaRepository seatJpaRepository;
+
+	@Autowired
+	private TokenJpaRepository tokenJpaRepository;
+
+	@Autowired
+	private ConcertJpaRepository concertJpaRepository;
+
+	@Autowired
+	private BalanceJpaRepository balanceJpaRepository;
+
+	@Autowired
+	private PaymentJpaRepository paymentJpaRepository;
+
+	@Autowired
+	private ScheduleJpaRepository scheduleJpaRepository;
+
+	@Autowired
+	private ReservationJpaRepository reservationJpaRepository;
 
 	@Test
 	@DisplayName("결제시 유저가 존재하지 않으면 예외가 발생한다.")

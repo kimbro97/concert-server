@@ -99,7 +99,7 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(java.time.LocalDateTime.now().plusMinutes(5)); // RESERVED 상태로 만들어줌
+		reservation.reserve(LocalDateTime.now().plusMinutes(5)); // RESERVED 상태로 만들어줌
 
 		// act
 		reservation.cancel();
@@ -107,5 +107,41 @@ class ReservationTest {
 		// assert
 		assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCEL);
 		verify(seat, times(1)).cancel(); // seat.cancel() 이 호출되었는지 검증
+	}
+
+	@Test
+	@DisplayName("예약취소시 예약상태가 CANCEL이라면 예외가 발생한다.")
+	void cancel_already_exception() {
+	    // arrange
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.cancel();
+
+		// act & assert
+		assertThatThrownBy(reservation::cancel)
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("이미 취소된 좌석입니다.");
+	}
+
+	@Test
+	@DisplayName("예약취소시 예약상태가 CANCEL이라면 예외가 발생한다.")
+	void cancel_confirm_exception() {
+		// arrange
+		User user = mock(User.class);
+		Schedule schedule = mock(Schedule.class);
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.validateNotExpired(LocalDateTime.now());
+
+		// act & assert
+		assertThatThrownBy(reservation::cancel)
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("이미 확정된 좌석입니다.");
 	}
 }
