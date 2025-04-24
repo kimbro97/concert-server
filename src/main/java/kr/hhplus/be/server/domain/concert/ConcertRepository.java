@@ -13,4 +13,6 @@ public interface ConcertRepository {
 	List<Schedule> findAllByConcertIdAndDateBetween(Long concertId, LocalDate startDate, LocalDate endDate);
 
 	List<Schedule> findAllSchedule();
+
+	Seat saveSeatAndFlush(Seat seat);
 }

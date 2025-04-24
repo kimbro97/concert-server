@@ -49,4 +49,9 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	public List<Schedule> findAllSchedule() {
 		return scheduleJpaRepository.findAll();
 	}
+
+	@Override
+	public Seat saveSeatAndFlush(Seat seat) {
+		return seatJpaRepository.saveAndFlush(seat);
+	}
 }
