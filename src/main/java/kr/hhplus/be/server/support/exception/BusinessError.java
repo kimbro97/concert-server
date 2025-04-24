@@ -18,6 +18,8 @@ public enum BusinessError {
 
 	// 발란스 관련 Error
 	NOT_FOUND_BALANCE_ERROR(NOT_FOUND, "발란스를 찾을 수 없습니다."),
+	CONCURRENT_POINT_CHARGE_CONFLICT(BAD_REQUEST, "동시에 충전이 요청되어 포인트 충전에 실패했습니다."),
+	CONCURRENT_POINT_USE_CONFLICT(BAD_REQUEST, "동시에 사용 요청되어 포인트 사용에 실패했습니다."),
 
 	// 콘서트 관련 Error
 	NOT_FOUND_CONCERT_ERROR(NOT_FOUND, "콘서트 항목을 찾을 수 없습니다." ),

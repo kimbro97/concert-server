@@ -116,7 +116,7 @@ class BalanceServiceUnitTest {
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(balanceRepository.findByUserId(userId)).thenReturn(Optional.of(balance));
-		when(balanceRepository.save(balance)).thenReturn(chargeBalance);
+		when(balanceRepository.saveAndFlush(balance)).thenReturn(chargeBalance);
 
 		BalanceInfo info = balanceService.charge(command);
 

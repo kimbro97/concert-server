@@ -23,4 +23,9 @@ public class BalanceRepositoryImpl implements BalanceRepository {
 	public Optional<Balance> findByUserId(Long userId) {
 		return balanceJpaRepository.findByUserIdWithLock(userId);
 	}
+
+	@Override
+	public Balance saveAndFlush(Balance balance) {
+		return balanceJpaRepository.saveAndFlush(balance);
+	}
 }
