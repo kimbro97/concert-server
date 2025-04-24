@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import kr.hhplus.be.server.domain.BaseEntity;
 import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.Getter;
@@ -36,6 +37,9 @@ public class Seat extends BaseEntity {
 	private Long price;
 
 	private Boolean isSelectable;
+
+	@Version
+	private Long version;
 
 	public Seat(Schedule schedule, String number, Long price, Boolean isSelectable) {
 		this.schedule = schedule;

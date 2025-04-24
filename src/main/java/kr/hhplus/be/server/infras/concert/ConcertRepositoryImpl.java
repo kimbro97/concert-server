@@ -32,7 +32,7 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
 	@Override
 	public Optional<Seat> findSeatById(Long SeatId) {
-		return seatJpaRepository.findById(SeatId);
+		return seatJpaRepository.findByIdWithLock(SeatId);
 	}
 
 	@Override
