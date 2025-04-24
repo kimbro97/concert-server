@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import kr.hhplus.be.server.domain.BaseEntity;
 import kr.hhplus.be.server.domain.user.User;
 import lombok.Getter;
@@ -31,6 +32,9 @@ public class Balance extends BaseEntity {
 	private User user;
 
 	private Long amount;
+
+	@Version
+	private Long version;
 
 	public Balance(User user, Long amount) {
 		this.user = user;

@@ -21,6 +21,6 @@ public class BalanceRepositoryImpl implements BalanceRepository {
 
 	@Override
 	public Optional<Balance> findByUserId(Long userId) {
-		return balanceJpaRepository.findByUserId(userId);
+		return balanceJpaRepository.findByUserIdWithLock(userId);
 	}
 }
