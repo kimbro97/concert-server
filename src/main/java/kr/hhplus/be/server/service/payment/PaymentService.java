@@ -4,9 +4,11 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
 import java.time.LocalDateTime;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.OptimisticLockException;
 import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.balance.BalanceRepository;
 import kr.hhplus.be.server.domain.payment.Payment;
@@ -31,22 +33,30 @@ public class PaymentService {
 	@Transactional
 	public PaymentInfo pay(PaymentCommand command) {
 
-		User user = userRepository.findById(command.getUserId())
-			.orElseThrow(NOT_FOUND_USER_ERROR::exception);
+		try {
 
-		Reservation reservation = reservationRepository.findById(command.getReservationId())
-			.orElseThrow(NOT_FOUND_RESERVATION_ERROR::exception);
+			User user = userRepository.findById(command.getUserId())
+				.orElseThrow(NOT_FOUND_USER_ERROR::exception);
 
-		Balance balance = balanceRepository.findByUserId(command.getUserId())
-			.orElseThrow(NOT_FOUND_BALANCE_ERROR::exception);
+			Reservation reservation = reservationRepository.findById(command.getReservationId())
+				.orElseThrow(NOT_FOUND_RESERVATION_ERROR::exception);
 
-		Payment payment = Payment.create(user, reservation);
-		payment.pay(balance, command.getNow());
+			Balance balance = balanceRepository.findByUserId(command.getUserId())
+				.orElseThrow(NOT_FOUND_BALANCE_ERROR::exception);
 
-		tokenRepository.deleteByUuid(command.getUuid());
-		paymentRepository.save(payment);
-		balanceRepository.save(balance);
+			Payment payment = Payment.create(user, reservation);
+			payment.pay(balance, command.getNow());
 
-		return PaymentInfo.from(payment);
+			tokenRepository.deleteByUuid(command.getUuid());
+			paymentRepository.save(payment);
+			balanceRepository.saveAndFlush(balance);
+
+			return PaymentInfo.from(payment);
+
+		} catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+
+			throw CONCURRENT_POINT_USE_CONFLICT.exception();
+
+		}
 	}
 }
