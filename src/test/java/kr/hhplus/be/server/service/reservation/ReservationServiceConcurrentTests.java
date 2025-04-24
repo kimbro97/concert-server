@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import kr.hhplus.be.server.infras.concert.ScheduleJpaRepository;
 import kr.hhplus.be.server.infras.concert.SeatJpaRepository;
 import kr.hhplus.be.server.infras.reservation.ReservationJpaRepository;
 import kr.hhplus.be.server.infras.user.UserJpaRepository;
-import kr.hhplus.be.server.support.exception.BusinessException;
 
 @SpringBootTest
 public class ReservationServiceConcurrentTests {
@@ -68,12 +68,16 @@ public class ReservationServiceConcurrentTests {
 		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 		CountDownLatch latch = new CountDownLatch(threadCount);
 
+		AtomicInteger successCount = new AtomicInteger(0);
+		AtomicInteger failCount = new AtomicInteger(0);
+
 		for (int i = 0; i < threadCount; i++) {
 			executorService.submit(() -> {
 				try {
 					reservationService.reserve(command);
-				} catch (BusinessException e) {
-					System.out.println("예약 실패: " + e.getMessage());
+					successCount.incrementAndGet();
+				} catch (Exception e) {
+					failCount.incrementAndGet();
 				} finally {
 					latch.countDown();
 				}
@@ -85,5 +89,7 @@ public class ReservationServiceConcurrentTests {
 		// assert
 		List<Reservation> reservations = reservationJpaRepository.findAll();
 		assertThat(reservations).hasSize(1);
+		assertThat(successCount.get()).isEqualTo(1);
+		assertThat(failCount.get()).isEqualTo(9);
 	}
 }
