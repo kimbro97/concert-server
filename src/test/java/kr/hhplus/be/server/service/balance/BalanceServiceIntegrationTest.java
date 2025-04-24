@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.balance.Balance;
-import kr.hhplus.be.server.domain.balance.BalanceRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.infras.balance.BalanceJpaRepository;
 import kr.hhplus.be.server.support.exception.BusinessException;
 
 @Transactional
@@ -22,7 +22,7 @@ class BalanceServiceIntegrationTest {
 	private UserRepository userRepository;
 
 	@Autowired
-	private BalanceRepository balanceRepository;
+	private BalanceJpaRepository balanceJpaRepository;
 
 	@Autowired
 	private BalanceService balanceService;
@@ -59,7 +59,7 @@ class BalanceServiceIntegrationTest {
 		User user = new User("kimbro", "1234");
 		userRepository.save(user);
 		Balance balance = new Balance(user, 0L);
-		balanceRepository.save(balance);
+		balanceJpaRepository.save(balance);
 
 		// act
 		BalanceInfo info = balanceService.getBalance(user.getId());
@@ -105,12 +105,12 @@ class BalanceServiceIntegrationTest {
 		User user = new User("kimbro", "1234");
 		Balance balance = new Balance(user, 0L);
 		userRepository.save(user);
-		balanceRepository.save(balance);
+		balanceJpaRepository.save(balance);
 		BalanceCommand.Charge command = new BalanceCommand.Charge(user.getId(), 10000L);
 		// act
 		balanceService.charge(command);
 		// assert
-		Balance updateBalance  = balanceRepository.findByUserId(user.getId()).orElseThrow();
+		Balance updateBalance  = balanceJpaRepository.findByUserId(user.getId()).orElseThrow();
 		assertThat(updateBalance.getAmount()).isEqualTo(10000L);
 	}
 
