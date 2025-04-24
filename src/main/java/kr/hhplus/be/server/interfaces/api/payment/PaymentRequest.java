@@ -7,8 +7,11 @@ import lombok.Getter;
 
 @Getter
 public class PaymentRequest {
-	private final Long userId;
-	private final Long reservationId;
+	private Long userId;
+	private Long reservationId;
+
+	public PaymentRequest() {
+	}
 
 	public PaymentRequest(Long userId, Long reservationId) {
 		this.userId = userId;

@@ -8,6 +8,9 @@ public class TokenRequest {
 	private Long userId;
 	private Long scheduleId;
 
+	public TokenRequest() {
+	}
+
 	public TokenRequest(Long userId, Long scheduleId) {
 		this.userId = userId;
 		this.scheduleId = scheduleId;

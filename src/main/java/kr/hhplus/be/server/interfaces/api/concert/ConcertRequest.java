@@ -16,6 +16,9 @@ public class ConcertRequest {
 
 		private String date;
 
+		public ConcertSchedule() {
+		}
+
 		public ConcertSchedule(String date) {
 			this.date = date;
 		}
