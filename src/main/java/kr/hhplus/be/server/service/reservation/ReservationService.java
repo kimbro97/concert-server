@@ -5,9 +5,11 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.OptimisticLockException;
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.concert.Seat;
@@ -16,6 +18,7 @@ import kr.hhplus.be.server.domain.reservation.ReservationRepository;
 import kr.hhplus.be.server.domain.reservation.ReservationStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,22 +32,28 @@ public class ReservationService {
 	@Transactional
 	public ReservationInfo reserve(ReservationCommand command) {
 
-		User user = userRepository.findById(command.getUserId())
-			.orElseThrow(NOT_FOUND_USER_ERROR::exception);
+		try {
+			User user = userRepository.findById(command.getUserId())
+				.orElseThrow(NOT_FOUND_USER_ERROR::exception);
 
-		Schedule schedule = concertRepository.findScheduleById(command.getScheduleId())
-			.orElseThrow(NOT_FOUND_SCHEDULE_ERROR::exception);
+			Schedule schedule = concertRepository.findScheduleById(command.getScheduleId())
+				.orElseThrow(NOT_FOUND_SCHEDULE_ERROR::exception);
 
-		Seat seat = concertRepository.findSeatById(command.getSeatId())
-			.orElseThrow(NOT_FOUND_SEAT_ERROR::exception);
+			Seat seat = concertRepository.findSeatById(command.getSeatId())
+				.orElseThrow(NOT_FOUND_SEAT_ERROR::exception);
 
-		Reservation reservation = Reservation.create(user, schedule, seat);
+			Reservation reservation = Reservation.create(user, schedule, seat);
 
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+			reservation.reserve(LocalDateTime.now().plusMinutes(5));
 
-		Reservation savedReservation = reservationRepository.save(reservation);
+			Reservation savedReservation = reservationRepository.save(reservation);
 
-		return ReservationInfo.from(savedReservation);
+			concertRepository.saveSeatAndFlush(seat);
+
+			return ReservationInfo.from(savedReservation);
+		} catch (ObjectOptimisticLockingFailureException | OptimisticLockException e) {
+			throw ALREADY_RESERVED_SEAT.exception();
+		}
 	}
 
 	@Transactional

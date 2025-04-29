@@ -7,7 +7,10 @@ public class ChargeRequest {
 
 	private static final Long MIN_CHARGE_AMOUNT = 0L;
 
-	private final Long amount;
+	private Long amount;
+
+	public ChargeRequest() {
+	}
 
 	public ChargeRequest(Long amount) {
 		this.amount = amount;

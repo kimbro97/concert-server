@@ -32,7 +32,7 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
 	@Override
 	public Optional<Seat> findSeatById(Long SeatId) {
-		return seatJpaRepository.findById(SeatId);
+		return seatJpaRepository.findByIdWithLock(SeatId);
 	}
 
 	@Override
@@ -48,5 +48,10 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	@Override
 	public List<Schedule> findAllSchedule() {
 		return scheduleJpaRepository.findAll();
+	}
+
+	@Override
+	public Seat saveSeatAndFlush(Seat seat) {
+		return seatJpaRepository.saveAndFlush(seat);
 	}
 }

@@ -71,7 +71,7 @@ class PaymentServiceTest {
 		verify(balance).use(totalAmount);
 		verify(tokenRepository).deleteByUuid("uuid_1");
 		verify(paymentRepository).save(any(Payment.class));
-		verify(balanceRepository).save(balance);
+		verify(balanceRepository).saveAndFlush(balance);
 	}
 
 

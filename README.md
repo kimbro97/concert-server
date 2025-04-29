@@ -12,3 +12,6 @@
 
 ### 인덱스 성능개선 보고서
 - [성능개선 보고서](https://kind-artichoke-34f.notion.site/1d9a4bf15f1a802eb377c92d1a918b8e?pvs=4)
+
+### 동시성 보고서
+- [동시성 보고서](./docs/동시성보고서.md)
