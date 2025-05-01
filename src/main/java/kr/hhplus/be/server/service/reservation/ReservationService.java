@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.service.reservation;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
+import static kr.hhplus.be.server.support.lock.LockType.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +31,7 @@ public class ReservationService {
 	private final ReservationRepository reservationRepository;
 
 	@Transactional
-	@DistributedLock(key = "'seatId:' + #command.getSeatId()")
+	@DistributedLock(key = "'seatId:' + #command.getSeatId()", waitTime = 1, type = SPIN)
 	public ReservationInfo reserve(ReservationCommand command) {
 		try {
 			User user = userRepository.findById(command.getUserId())
