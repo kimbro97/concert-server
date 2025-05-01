@@ -12,6 +12,15 @@ services:
     volumes:
       - ./data/mysql/:/var/lib/mysql
 
+  redis:
+    container_name: concert-redis
+    image: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"] # 레디스 영속성 설정
+    volumes:
+      - ./data/redis/:/data
+
 networks:
   default:
     driver: bridge
