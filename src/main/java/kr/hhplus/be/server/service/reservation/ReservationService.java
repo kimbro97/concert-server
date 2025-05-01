@@ -18,7 +18,7 @@ import kr.hhplus.be.server.domain.reservation.ReservationRepository;
 import kr.hhplus.be.server.domain.reservation.ReservationStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
-import kr.hhplus.be.server.support.exception.BusinessError;
+import kr.hhplus.be.server.support.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,8 +30,8 @@ public class ReservationService {
 	private final ReservationRepository reservationRepository;
 
 	@Transactional
+	@DistributedLock(key = "'seatId:' + #command.getSeatId()")
 	public ReservationInfo reserve(ReservationCommand command) {
-
 		try {
 			User user = userRepository.findById(command.getUserId())
 				.orElseThrow(NOT_FOUND_USER_ERROR::exception);
