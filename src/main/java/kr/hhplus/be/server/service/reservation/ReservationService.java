@@ -31,7 +31,7 @@ public class ReservationService {
 	private final ReservationRepository reservationRepository;
 
 	@Transactional
-	@DistributedLock(key = "'seatId:' + #command.getSeatId()", waitTime = 1, type = SPIN)
+	@DistributedLock(key = "'seatId:' + #command.getSeatId()", waitTime = 1, type = PUBSUB)
 	public ReservationInfo reserve(ReservationCommand command) {
 		try {
 			User user = userRepository.findById(command.getUserId())

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import kr.hhplus.be.server.support.lock.strategy.LockStrategy;
+import kr.hhplus.be.server.support.lock.strategy.PubSubLockStrategy;
 import kr.hhplus.be.server.support.lock.strategy.SimpleLockStrategy;
 import kr.hhplus.be.server.support.lock.strategy.SpinLockStrategy;
 
@@ -15,10 +16,11 @@ public class LockStrategyFactory {
 
 	private final Map<LockType, LockStrategy> strategies;
 
-	public LockStrategyFactory(SimpleLockStrategy simple, SpinLockStrategy spin) {
+	public LockStrategyFactory(SimpleLockStrategy simple, SpinLockStrategy spin, PubSubLockStrategy pubSub) {
 		this.strategies = Map.of(
 			SIMPLE, simple,
-			SPIN, spin
+			SPIN, spin,
+			PUBSUB, pubSub
 		);
 	}
 
