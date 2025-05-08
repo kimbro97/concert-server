@@ -4,7 +4,9 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
@@ -17,6 +19,12 @@ public class ConcertService {
 
 	private final ConcertRepository concertRepository;
 
+	@Transactional(readOnly = true)
+	@Cacheable(
+		cacheNames = "seats",
+		cacheManager = "scheduleCacheManager",
+		key = "#command.concertId + ':' + #command.startData + ':' + #command.endData"
+	)
 	public List<ConcertInfo.ScheduleInfo> getSchedule(ConcertCommand.Schedule command) {
 
 		concertRepository.findConcertById(command.getConcertId())

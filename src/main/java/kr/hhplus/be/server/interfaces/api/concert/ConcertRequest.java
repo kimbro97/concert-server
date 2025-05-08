@@ -9,15 +9,13 @@ import java.time.format.DateTimeFormatter;
 import kr.hhplus.be.server.service.concert.ConcertCommand;
 import lombok.Getter;
 
+@Getter
 public class ConcertRequest {
 
 	@Getter
 	public static class ConcertSchedule {
 
 		private String date;
-
-		public ConcertSchedule() {
-		}
 
 		public ConcertSchedule(String date) {
 			this.date = date;
