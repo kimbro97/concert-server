@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.service.balance;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
+import static kr.hhplus.be.server.support.lock.LockType.*;
 
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import jakarta.persistence.OptimisticLockException;
 import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.balance.BalanceRepository;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,6 +35,7 @@ public class BalanceService {
 	}
 
 	@Transactional
+	@DistributedLock(key = "'userId:' + #command.getUserId()", leaseTime = 2, type = SIMPLE)
 	public BalanceInfo charge(BalanceCommand.Charge command) {
 		try {
 			userRepository.findById(command.getUserId())
