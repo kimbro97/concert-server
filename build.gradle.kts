@@ -41,6 +41,12 @@ dependencies {
 	// redisson
 	implementation("org.redisson:redisson-spring-boot-starter:3.46.0")
 
+	// cache
+	implementation ("org.springframework.boot:spring-boot-starter-cache")
+
+	// caffeine
+	implementation ("com.github.ben-manes.caffeine:caffeine")
+
 	// swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
