@@ -1,8 +1,7 @@
 package kr.hhplus.be.server.service.payment;
 
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
-
-import java.time.LocalDateTime;
+import static kr.hhplus.be.server.support.lock.LockType.*;
 
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import kr.hhplus.be.server.domain.reservation.ReservationRepository;
 import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,6 +31,7 @@ public class PaymentService {
 	private final ReservationRepository reservationRepository;
 
 	@Transactional
+	@DistributedLock(key = "'userId:' + #command.getUserId()", leaseTime = 2, type = SIMPLE)
 	public PaymentInfo pay(PaymentCommand command) {
 
 		try {
