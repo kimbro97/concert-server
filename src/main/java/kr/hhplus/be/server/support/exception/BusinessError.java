@@ -40,7 +40,10 @@ public enum BusinessError {
 
 	// 토큰 관련
 	NOT_FOUND_TOKEN_ERROR(BAD_REQUEST, "토큰값을 찾을 수 없습니다."),
-	TOKEN_NOT_ACTIVE_ERROR(BAD_REQUEST, "토큰이 ACTIVE 상태가 아니므로 사용할 수 없습니다.");
+	TOKEN_NOT_ACTIVE_ERROR(BAD_REQUEST, "토큰이 ACTIVE 상태가 아니므로 사용할 수 없습니다."),
+
+	// 락 관련
+	LOCK_ACQUISITION_FAILED_ERROR(BAD_REQUEST, "락 획득에 실패했습니다.");
 
 
 	private final HttpStatus httpStatus;

@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.support.lock;
 
+import static kr.hhplus.be.server.support.exception.BusinessError.*;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.UUID;
@@ -49,7 +51,7 @@ public class DistributedLockAspect {
 		boolean lockSuccess = strategy.tryLock(lockKey, value, waitTime, leaseTime, timeUnit);
 
 		if (!lockSuccess) {
-			throw new IllegalArgumentException("락 획득에 실패했습니다.");
+			throw LOCK_ACQUISITION_FAILED_ERROR.exception();
 		}
 
 		try {
