@@ -17,7 +17,9 @@ class ConcertRequestTest {
 	@Test
 	@DisplayName("정상적인 연월을 입력하면 ConcertCommand.Schedule이 생성된다")
 	void toCommand_성공() {
-		ConcertRequest.ConcertSchedule request = new ConcertRequest.ConcertSchedule("2025-04");
+
+		String yearMonth = YearMonth.now().toString();
+		ConcertRequest.ConcertSchedule request = new ConcertRequest.ConcertSchedule(yearMonth);
 
 		ConcertCommand.Schedule command = request.toCommand(1L);
 		assertThat(command.getConcertId()).isEqualTo(1L);
