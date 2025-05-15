@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.infras.concert;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,12 +22,11 @@ public class ConcertRedisRepository {
 		this.zSetOps = stringRedisTemplate.opsForZSet();
 	}
 
-	public Long incrementScheduleCount(Long concertId, Long scheduleId) {
+	public Long incrementScheduleCount(Long concertId, Long scheduleId, LocalDateTime today, LocalDate expireDate) {
 		String key = "concert:" + concertId + ":schedule:" + scheduleId + ":count";
 		Long count = stringRedisTemplate.opsForValue().increment(key);
 
-		LocalDateTime today = LocalDateTime.now();
-		LocalDateTime targetMidnight = today.toLocalDate().plusDays(1).atStartOfDay();
+		LocalDateTime targetMidnight = expireDate.plusDays(1).atStartOfDay();
 
 		setExpireUntil(key, Duration.between(today, targetMidnight));
 		return count;

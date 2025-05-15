@@ -17,7 +17,7 @@ public interface ConcertRepository {
 
 	Seat saveSeatAndFlush(Seat seat);
 
-	Long incrementScheduleCount(Long concertId, Long scheduleId);
+	Long incrementScheduleCount(Long concertId, Long scheduleId, LocalDateTime today, LocalDate date);
 
 	void addRanking(LocalDateTime today, Long concertId, double score);
 

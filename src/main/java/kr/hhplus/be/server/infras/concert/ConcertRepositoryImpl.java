@@ -58,8 +58,8 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	}
 
 	@Override
-	public Long incrementScheduleCount(Long concertId, Long scheduleId) {
-		return concertRedisRepository.incrementScheduleCount(concertId, scheduleId);
+	public Long incrementScheduleCount(Long concertId, Long scheduleId, LocalDateTime today, LocalDate expireDate) {
+		return concertRedisRepository.incrementScheduleCount(concertId, scheduleId, today, expireDate);
 	}
 
 	@Override

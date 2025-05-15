@@ -58,7 +58,7 @@ public class PaymentService {
 			balanceRepository.saveAndFlush(balance);
 
 			Long count = concertRepository.incrementScheduleCount(reservation.getSchedule().getConcert().getId(),
-				reservation.getSchedule().getId());
+				reservation.getSchedule().getId(), LocalDateTime.now(), reservation.getSchedule().getDate());
 
 			if (count == 50L) {
 				LocalDateTime today = LocalDateTime.now();
