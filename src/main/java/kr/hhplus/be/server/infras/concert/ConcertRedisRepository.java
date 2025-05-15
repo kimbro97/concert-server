@@ -32,13 +32,10 @@ public class ConcertRedisRepository {
 
 	public List<Long> getTopRankings(LocalDateTime today) {
 		String key = "concert:ranking:" + today.format(DateTimeFormatter.BASIC_ISO_DATE);
-
 		Set<String> rankings = zSetOps.range(key, 0, 14);
 
-		// 오늘 랭킹 없으면 어제 랭킹 조회 (TTL 2일 설정)
 		if (rankings.isEmpty()) {
-			String yesterdayKey = "concert:ranking:" + today.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
-			rankings = zSetOps.range(yesterdayKey, 0, 14);
+			return List.of();
 		}
 
 		return rankings.stream()

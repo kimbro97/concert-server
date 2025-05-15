@@ -27,6 +27,10 @@ public class ConcertService {
 	public List<ConcertInfo> getConcertTopRankings(LocalDateTime today) {
 		List<Long> topRankings = concertRepository.getTopRankings(today);
 
+		if (topRankings.isEmpty()) {
+			topRankings = concertRepository.getTopRankings(today.minusDays(1));
+		}
+
 		Map<Long, Concert> concertMap = concertRepository.findAllByIdIn(topRankings).stream()
 			.collect(Collectors.toMap(Concert::getId, Function.identity()));
 
