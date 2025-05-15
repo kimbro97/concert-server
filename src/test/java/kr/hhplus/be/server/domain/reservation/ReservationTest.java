@@ -3,11 +3,13 @@ package kr.hhplus.be.server.domain.reservation;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import kr.hhplus.be.server.domain.concert.Concert;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.concert.Seat;
 import kr.hhplus.be.server.domain.user.User;
@@ -27,7 +29,7 @@ class ReservationTest {
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
 		// act
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 
 		// assert
 		assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.RESERVED);
@@ -53,7 +55,7 @@ class ReservationTest {
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
 		// act & assert
-		assertThatThrownBy(() -> reservation.reserve(LocalDateTime.now().plusMinutes(5)))
+		assertThatThrownBy(() -> reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now()))
 			.isInstanceOf(BusinessException.class)
 			.hasMessageContaining("이미 예약된 좌석");
 
@@ -71,7 +73,7 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 
 		reservation.validateNotExpired(LocalDateTime.now());
 	}
@@ -84,7 +86,7 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().minusMinutes(5));
+		reservation.reserve(LocalDateTime.now().minusMinutes(5), LocalDateTime.now());
 
 		assertThatThrownBy(() -> reservation.validateNotExpired(LocalDateTime.now()))
 			.isInstanceOf(BusinessException.class);
@@ -99,7 +101,7 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5)); // RESERVED 상태로 만들어줌
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now()); // RESERVED 상태로 만들어줌
 
 		// act
 		reservation.cancel();
@@ -118,7 +120,7 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 		reservation.cancel();
 
 		// act & assert
@@ -136,12 +138,28 @@ class ReservationTest {
 		Seat seat = mock(Seat.class);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 		reservation.validateNotExpired(LocalDateTime.now());
 
 		// act & assert
 		assertThatThrownBy(reservation::cancel)
 			.isInstanceOf(BusinessException.class)
 			.hasMessageContaining("이미 확정된 좌석입니다.");
+	}
+
+	@Test
+	@DisplayName("아직 오픈되지 않은 스케줄을 예약시 예외가 발생한다.")
+	void schedule_opened_exception() {
+	    // arrange
+		User user = mock(User.class);
+		Concert concert = mock(Concert.class);
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now().plusMinutes(5));
+		Seat seat = mock(Seat.class);
+
+		Reservation reservation = Reservation.create(user, schedule, seat);
+	    // act & assert
+	    assertThatThrownBy(() -> reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now()))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("아직 오픈되지 않은 스케줄입니다.");
 	}
 }
