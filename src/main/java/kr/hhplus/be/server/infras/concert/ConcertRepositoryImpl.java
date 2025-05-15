@@ -76,4 +76,9 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	public List<Concert> findAllByIdIn(List<Long> ids) {
 		return concertJpaRepository.findAllByIdIn(ids);
 	}
+
+	@Override
+	public Long countByScheduleId(Long scheduleId) {
+		return seatJpaRepository.countByScheduleId(scheduleId);
+	}
 }

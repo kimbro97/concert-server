@@ -60,7 +60,9 @@ public class PaymentService {
 			Long count = concertRepository.incrementScheduleCount(reservation.getSchedule().getConcert().getId(),
 				reservation.getSchedule().getId(), LocalDateTime.now(), reservation.getSchedule().getDate());
 
-			if (count == 50L) {
+			Long seatCount = concertRepository.countByScheduleId(reservation.getSchedule().getId());
+
+			if (count.equals(seatCount)) {
 				LocalDateTime today = LocalDateTime.now();
 				concertRepository.addRanking(today, reservation.getSchedule().getConcert().getId(),
 					Duration.between(reservation.getSchedule().getOpenedAt(), today).toMillis());

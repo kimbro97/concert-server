@@ -24,4 +24,6 @@ public interface ConcertRepository {
 	List<Long> getTopRankings(LocalDateTime today);
 
 	List<Concert> findAllByIdIn(List<Long> ids);
+
+	Long countByScheduleId(Long scheduleId);
 }
