@@ -21,4 +21,7 @@ public interface ConcertRepository {
 
 	void addRanking(LocalDateTime today, Long concertId, double score);
 
+	List<Long> getTopRankings(LocalDateTime today);
+
+	List<Concert> findAllByIdIn(List<Long> ids);
 }

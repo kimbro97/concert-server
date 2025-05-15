@@ -2,6 +2,7 @@ package kr.hhplus.be.server.infras.concert;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,6 +28,22 @@ public class ConcertRedisRepository {
 	public void addRanking(LocalDateTime today, Long concertId, double score) {
 		String key = "concert:ranking:" + today.format(DateTimeFormatter.BASIC_ISO_DATE);
 		zSetOps.add(key, String.valueOf(concertId), score);
+	}
+
+	public List<Long> getTopRankings(LocalDateTime today) {
+		String key = "concert:ranking:" + today.format(DateTimeFormatter.BASIC_ISO_DATE);
+
+		Set<String> rankings = zSetOps.range(key, 0, 14);
+
+		// 오늘 랭킹 없으면 어제 랭킹 조회 (TTL 2일 설정)
+		if (rankings.isEmpty()) {
+			String yesterdayKey = "concert:ranking:" + today.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
+			rankings = zSetOps.range(yesterdayKey, 0, 14);
+		}
+
+		return rankings.stream()
+			.map(Long::valueOf)
+			.toList();
 	}
 
 }

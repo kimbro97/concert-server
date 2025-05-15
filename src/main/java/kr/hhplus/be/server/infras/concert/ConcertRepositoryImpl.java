@@ -66,4 +66,14 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	public void addRanking(LocalDateTime today, Long concertId, double score) {
 		concertRedisRepository.addRanking(today, concertId, score);
 	}
+
+	@Override
+	public List<Long> getTopRankings(LocalDateTime today) {
+		return concertRedisRepository.getTopRankings(today);
+	}
+
+	@Override
+	public List<Concert> findAllByIdIn(List<Long> ids) {
+		return concertJpaRepository.findAllByIdIn(ids);
+	}
 }
