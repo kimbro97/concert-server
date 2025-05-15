@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.concert;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,4 +16,9 @@ public interface ConcertRepository {
 	List<Schedule> findAllSchedule();
 
 	Seat saveSeatAndFlush(Seat seat);
+
+	Long incrementScheduleCount(Long concertId, Long scheduleId);
+
+	void addRanking(LocalDateTime today, Long concertId, double score);
+
 }

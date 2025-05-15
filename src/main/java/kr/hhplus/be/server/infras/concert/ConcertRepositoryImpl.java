@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.infras.concert;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	private final SeatJpaRepository seatJpaRepository;
 	private final ConcertJpaRepository concertJpaRepository;
 	private final ScheduleJpaRepository scheduleJpaRepository;
+	private final ConcertRedisRepository concertRedisRepository;
 
 	@Override
 	public Optional<Concert> findConcertById(Long concertId) {
@@ -53,5 +55,15 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 	@Override
 	public Seat saveSeatAndFlush(Seat seat) {
 		return seatJpaRepository.saveAndFlush(seat);
+	}
+
+	@Override
+	public Long incrementScheduleCount(Long concertId, Long scheduleId) {
+		return concertRedisRepository.incrementScheduleCount(concertId, scheduleId);
+	}
+
+	@Override
+	public void addRanking(LocalDateTime today, Long concertId, double score) {
+		concertRedisRepository.addRanking(today, concertId, score);
 	}
 }
