@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -68,5 +69,35 @@ class ConcertRedisRepositoryTest {
 		Long size = redisTemplate.opsForZSet()
 			.size("concert:ranking:" + today.format(DateTimeFormatter.BASIC_ISO_DATE));
 		assertThat(size).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("매진까지 걸린 시간이 짧은 순으로 인기 concert 랭킹을 조회할 수 있다")
+	void find_concert_ranking () {
+		// arrange
+		LocalDateTime today = LocalDateTime.now();
+
+		Long concertId1 = 1L;
+		LocalDateTime openedAt1 = LocalDateTime.now().minusMinutes(5);
+		long elapsedMillis1 = Duration.between(openedAt1, today).toMillis();
+		concertRedisRepository.addRanking(today, concertId1, elapsedMillis1);
+
+		Long concertId2 = 2L;
+		LocalDateTime openedAt2 = LocalDateTime.now().minusMinutes(4);
+		long elapsedMillis2 = Duration.between(openedAt2, today).toMillis();
+		concertRedisRepository.addRanking(today, concertId2, elapsedMillis2);
+
+		Long concertId3 = 3L;
+		LocalDateTime openedAt3 = LocalDateTime.now().minusMinutes(6);
+		long elapsedMillis3 = Duration.between(openedAt3, today).toMillis();
+		concertRedisRepository.addRanking(today, concertId3, elapsedMillis3);
+		// act
+
+		List<Long> topRankingList = concertRedisRepository.getTopRankings(today);
+		// assert
+		assertThat(topRankingList).hasSize(3);
+		assertThat(topRankingList.get(0)).isEqualTo(2L);
+		assertThat(topRankingList.get(1)).isEqualTo(1L);
+		assertThat(topRankingList.get(2)).isEqualTo(3L);
 	}
 }
