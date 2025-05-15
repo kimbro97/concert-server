@@ -72,6 +72,9 @@ class PaymentServiceTest {
 		when(schedule.getId()).thenReturn(100L);
 		when(concert.getId()).thenReturn(200L);
 
+		when(concertRepository.incrementScheduleCount(any(), any(), any(), any())).thenReturn(1L);
+		when(concertRepository.countByScheduleId(100L)).thenReturn(2L);
+
 		// act
 		PaymentInfo result = paymentService.pay(command);
 

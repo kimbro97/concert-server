@@ -28,7 +28,7 @@ class ConcertRedisRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		Set<String> keys = redisTemplate.keys("concert:1:schedule:*:count");
+		Set<String> keys = redisTemplate.keys("concert:*:schedule:*:count");
 		if (keys != null && !keys.isEmpty()) {
 			redisTemplate.delete(keys);
 		}

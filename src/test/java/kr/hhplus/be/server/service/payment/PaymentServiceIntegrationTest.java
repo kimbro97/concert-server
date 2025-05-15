@@ -4,12 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.balance.Balance;
@@ -48,6 +52,9 @@ class PaymentServiceIntegrationTest {
 	private TokenJpaRepository tokenJpaRepository;
 
 	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
+
+	@Autowired
 	private ConcertJpaRepository concertJpaRepository;
 
 	@Autowired
@@ -61,6 +68,18 @@ class PaymentServiceIntegrationTest {
 
 	@Autowired
 	private ReservationJpaRepository reservationJpaRepository;
+
+	@BeforeEach
+	void setUp() {
+		Set<String> keys = stringRedisTemplate.keys("concert:*:schedule:*:count");
+		if (keys != null && !keys.isEmpty()) {
+			stringRedisTemplate.delete(keys);
+		}
+		Set<String> sortedSet = stringRedisTemplate.keys("concert:ranking:*");
+		if (sortedSet != null && !sortedSet.isEmpty()) {
+			stringRedisTemplate.delete(sortedSet);
+		}
+	}
 
 	@Test
 	@DisplayName("결제시 유저가 존재하지 않으면 예외가 발생한다.")
@@ -223,8 +242,12 @@ class PaymentServiceIntegrationTest {
 		Payment payment = paymentJpaRepository.findById(info.getPaymentId()).orElseThrow();
 		Optional<Token> deleteToken = tokenJpaRepository.findByUuid(uuid);
 		Balance findBalance = balanceJpaRepository.findByUserId(user.getId()).orElseThrow();
+		Long size = stringRedisTemplate.opsForZSet()
+			.size("concert:ranking:" + LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+
 		assertThat(payment.getId()).isEqualTo(info.getPaymentId());
 		assertThat(deleteToken).isEmpty();
 		assertThat(findBalance.getAmount()).isEqualTo(100L);
+		assertThat(size).isEqualTo(1L);
 	}
 }
