@@ -3,6 +3,7 @@ package kr.hhplus.be.server.service.reservation;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +57,7 @@ public class ReservationServiceConcurrentTests {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);

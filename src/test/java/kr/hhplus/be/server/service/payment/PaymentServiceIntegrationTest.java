@@ -103,14 +103,14 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);
 		seatJpaRepository.save(seat);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -132,7 +132,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);
@@ -142,7 +142,7 @@ class PaymentServiceIntegrationTest {
 		balanceJpaRepository.save(balance);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -164,7 +164,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 10000L, true);
@@ -174,7 +174,7 @@ class PaymentServiceIntegrationTest {
 		balanceJpaRepository.save(balance);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -198,7 +198,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 900L, true);
@@ -211,7 +211,7 @@ class PaymentServiceIntegrationTest {
 		tokenJpaRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		PaymentCommand command = new PaymentCommand(user.getId(), reservation.getId(), uuid, LocalDateTime.of(2025, 4, 17, 16, 30));

@@ -21,11 +21,11 @@ class ReservationInfoTest {
 	void from_정상_매핑() {
 		// arrange
 		User user = new User("testUser", "1234");
-		Schedule schedule = new Schedule(mock(Concert.class), LocalDate.now());
+		Schedule schedule = new Schedule(mock(Concert.class), LocalDate.now(), LocalDateTime.now());
 		Seat seat = new Seat(schedule, "A1", 12000L, true);
 		Reservation reservation = Reservation.create(user, schedule, seat);
 
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 
 		// act
 		ReservationInfo info = ReservationInfo.from(reservation);
