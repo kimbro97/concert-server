@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.infras.concert;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,12 +23,20 @@ public class ConcertRedisRepository {
 
 	public Long incrementScheduleCount(Long concertId, Long scheduleId) {
 		String key = "concert:" + concertId + ":schedule:" + scheduleId + ":count";
-		return stringRedisTemplate.opsForValue().increment(key);
+		Long count = stringRedisTemplate.opsForValue().increment(key);
+
+		LocalDateTime today = LocalDateTime.now();
+		LocalDateTime targetMidnight = today.toLocalDate().plusDays(1).atStartOfDay();
+
+		setExpireUntil(key, Duration.between(today, targetMidnight));
+		return count;
 	}
 
 	public void addRanking(LocalDateTime today, Long concertId, double score) {
 		String key = "concert:ranking:" + today.format(DateTimeFormatter.BASIC_ISO_DATE);
 		zSetOps.add(key, String.valueOf(concertId), score);
+		LocalDateTime targetMidnight = today.toLocalDate().plusDays(2).atStartOfDay();
+		setExpireUntil(key, Duration.between(today, targetMidnight));
 	}
 
 	public List<Long> getTopRankings(LocalDateTime today) {
@@ -43,4 +52,7 @@ public class ConcertRedisRepository {
 			.toList();
 	}
 
+	private void setExpireUntil(String key, Duration duration) {
+		stringRedisTemplate.expire(key, duration);
+	}
 }
