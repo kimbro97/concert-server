@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class TokenRepositoryImpl implements TokenRepository {
 
 	private final TokenJpaRepository tokenJpaRepository;
+	private final TokenRedisRepository tokenRedisRepository;
 
 	@Override
 	public Optional<Token> findByUuid(String uuid) {
@@ -25,7 +26,7 @@ public class TokenRepositoryImpl implements TokenRepository {
 
 	@Override
 	public Token save(Token token) {
-		return tokenJpaRepository.save(token);
+		return tokenRedisRepository.save(token);
 	}
 
 	@Override
