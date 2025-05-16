@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.infras.token;
 
+import static kr.hhplus.be.server.support.exception.BusinessError.*;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.hhplus.be.server.domain.token.Token;
+import kr.hhplus.be.server.support.exception.BusinessError;
 
 @Repository
 public class TokenRedisRepository {
@@ -45,7 +48,7 @@ public class TokenRedisRepository {
 			String json = objectMapper.writeValueAsString(token);
 			stringRedisTemplate.opsForValue().set(stringKey, json);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
+			throw TOKEN_SERIALIZATION_ERROR.exception();
 		}
 		return token;
 	}
@@ -62,7 +65,7 @@ public class TokenRedisRepository {
 		try {
 			token = objectMapper.readValue(json, Token.class);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
+			throw TOKEN_DESERIALIZATION_ERROR.exception();
 		}
 
 		return Optional.of(token);
@@ -94,7 +97,7 @@ public class TokenRedisRepository {
 			Token token = objectMapper.readValue(json, Token.class);
 			return Optional.of(token);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Failed to deserialize token JSON: " + json, e);
+			throw TOKEN_DESERIALIZATION_ERROR.exception();
 		}
 	}
 
@@ -110,7 +113,7 @@ public class TokenRedisRepository {
 			String json = objectMapper.writeValueAsString(token);
 			stringRedisTemplate.opsForValue().set(stringKey, json);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
+			throw TOKEN_SERIALIZATION_ERROR.exception();
 		}
 	}
 
