@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ class TokenServiceTest {
 
 		User user = new User("testUser", "1234");
 		Concert concert = new Concert("방탄콘서트");
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(concertRepository.findScheduleById(scheduleId)).thenReturn(Optional.of(schedule));

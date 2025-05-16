@@ -3,6 +3,7 @@ package kr.hhplus.be.server.service.concert;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -62,11 +63,11 @@ class ConcertServiceIntegrationTest {
 		Concert concert2 = new Concert("DG 10주년 콘서트");
 		concertJpaRepository.save(concert2);
 
-		Schedule schedule1 = new Schedule(concert1, LocalDate.of(2025, 4, 1));
-		Schedule schedule2 = new Schedule(concert1, LocalDate.of(2025, 4, 2));
-		Schedule schedule3 = new Schedule(concert1, LocalDate.of(2025, 4, 3));
-		Schedule schedule4 = new Schedule(concert1, LocalDate.of(2025, 4, 4));
-		Schedule schedule5 = new Schedule(concert2, LocalDate.of(2025, 4, 4));
+		Schedule schedule1 = new Schedule(concert1, LocalDate.of(2025, 4, 1), LocalDateTime.now());
+		Schedule schedule2 = new Schedule(concert1, LocalDate.of(2025, 4, 2), LocalDateTime.now());
+		Schedule schedule3 = new Schedule(concert1, LocalDate.of(2025, 4, 3), LocalDateTime.now());
+		Schedule schedule4 = new Schedule(concert1, LocalDate.of(2025, 4, 4), LocalDateTime.now());
+		Schedule schedule5 = new Schedule(concert2, LocalDate.of(2025, 4, 4), LocalDateTime.now());
 		scheduleJpaRepository.saveAll(List.of(schedule1, schedule2, schedule3, schedule4,schedule5));
 
 		LocalDate startDate = LocalDate.of(2025, 4, 2);
@@ -100,7 +101,7 @@ class ConcertServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.of(2025, 4, 1));
+		Schedule schedule = new Schedule(concert, LocalDate.of(2025, 4, 1), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat1 = new Seat(schedule, "1", 1000L, false);

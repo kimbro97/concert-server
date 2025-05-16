@@ -17,4 +17,6 @@ public interface SeatJpaRepository extends JpaRepository<Seat, Long> {
 	@Lock(LockModeType.OPTIMISTIC)
 	@Query("SELECT s FROM Seat s WHERE s.id = :id")
 	Optional<Seat> findByIdWithLock(@Param("id") Long id);
+
+	Long countByScheduleId(Long scheduleId);
 }

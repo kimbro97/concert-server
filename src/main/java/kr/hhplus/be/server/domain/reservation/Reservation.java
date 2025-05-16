@@ -62,7 +62,8 @@ public class Reservation extends BaseEntity {
 		this.seat = seat;
 	}
 
-	public void reserve(LocalDateTime expiredAt) {
+	public void reserve(LocalDateTime expiredAt, LocalDateTime now) {
+		schedule.validateOpen(now);
 		seat.reserve();
 		this.totalAmount = seat.calculatePrice();
 		this.status = RESERVED;

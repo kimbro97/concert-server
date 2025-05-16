@@ -46,7 +46,7 @@ class ReservationServiceUnitTest {
 		ReservationCommand command = new ReservationCommand(userId, scheduleId, seatId);
 
 		User user = new User("testUser", "1234");
-		Schedule schedule = new Schedule(new Concert("방탄콘서트"), LocalDate.now());
+		Schedule schedule = new Schedule(new Concert("방탄콘서트"), LocalDate.now(), LocalDateTime.now());
 		Seat seat = new Seat(schedule, "A1", 10000L, true);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -139,5 +139,26 @@ class ReservationServiceUnitTest {
 		// assert
 		verify(reservation1).cancel();
 		verify(reservation2).cancel();
+	}
+
+	@Test
+	@DisplayName("아직 오픈되지 않은 스케줄을 예약시 예외가 발생한다.")
+	void reserve_schedule_opened_exception() {
+		// arrange
+		Long seatId = 3L;
+		ReservationCommand command = new ReservationCommand(1L, 2L, seatId);
+		Concert concert = mock(Concert.class);
+		Schedule schedule = new Schedule(concert, LocalDate.now().plusDays(5), LocalDateTime.now().plusMinutes(5));
+
+		when(userRepository.findById(1L)).thenReturn(Optional.of(mock(User.class)));
+		when(concertRepository.findScheduleById(2L)).thenReturn(Optional.of(schedule));
+		when(concertRepository.findSeatById(seatId)).thenReturn(Optional.of(mock(Seat.class)));
+
+		// act & assert
+		assertThatThrownBy(() -> reservationService.reserve(command))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("아직 오픈되지 않은 스케줄입니다.");
+
+		verify(reservationRepository, never()).save(any());
 	}
 }

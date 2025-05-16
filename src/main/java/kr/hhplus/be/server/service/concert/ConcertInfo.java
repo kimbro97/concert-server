@@ -2,12 +2,30 @@ package kr.hhplus.be.server.service.concert;
 
 import java.time.LocalDate;
 
+import kr.hhplus.be.server.domain.concert.Concert;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.concert.Seat;
 import lombok.Builder;
 import lombok.Getter;
 
+@Getter
 public class ConcertInfo {
+
+	private final Long concertId;
+	private final String title;
+
+	@Builder
+	public ConcertInfo(Long concertId, String title) {
+		this.concertId = concertId;
+		this.title = title;
+	}
+
+	public static ConcertInfo from(Concert concert) {
+		return ConcertInfo.builder()
+			.concertId(concert.getId())
+			.title(concert.getTitle())
+			.build();
+	}
 
 	@Getter
 	public static class ScheduleInfo {

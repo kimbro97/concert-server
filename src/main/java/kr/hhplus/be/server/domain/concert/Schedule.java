@@ -1,9 +1,11 @@
 package kr.hhplus.be.server.domain.concert;
 
 import static jakarta.persistence.GenerationType.*;
+import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static lombok.AccessLevel.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -34,8 +36,17 @@ public class Schedule extends BaseEntity {
 
 	private LocalDate date;
 
-	public Schedule(Concert concert, LocalDate date) {
+	private LocalDateTime openedAt;
+
+	public Schedule(Concert concert, LocalDate date, LocalDateTime openedAt) {
 		this.concert = concert;
 		this.date = date;
+		this.openedAt = openedAt;
+	}
+
+	public void validateOpen(LocalDateTime now) {
+		if (openedAt.isAfter(now)) {
+			throw RESERVATION_NOT_ALLOWED_BEFORE_OPEN.exception();
+		}
 	}
 }

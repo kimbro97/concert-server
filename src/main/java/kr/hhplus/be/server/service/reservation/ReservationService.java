@@ -45,7 +45,7 @@ public class ReservationService {
 
 			Reservation reservation = Reservation.create(user, schedule, seat);
 
-			reservation.reserve(LocalDateTime.now().plusMinutes(5));
+			reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 
 			Reservation savedReservation = reservationRepository.save(reservation);
 

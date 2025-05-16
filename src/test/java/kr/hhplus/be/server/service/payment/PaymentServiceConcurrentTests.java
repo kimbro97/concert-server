@@ -76,7 +76,7 @@ class PaymentServiceConcurrentTests {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 900L, true);
@@ -89,7 +89,7 @@ class PaymentServiceConcurrentTests {
 		tokenJpaRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		PaymentCommand command = new PaymentCommand(user.getId(), reservation.getId(), uuid, LocalDateTime.of(2025, 4, 17, 16, 30));

@@ -90,7 +90,7 @@ class ReservationServiceIntegrateTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 		Long seatId = 1L;
 
@@ -112,7 +112,7 @@ class ReservationServiceIntegrateTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, false);
@@ -136,7 +136,7 @@ class ReservationServiceIntegrateTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);
@@ -167,7 +167,7 @@ class ReservationServiceIntegrateTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat1 = new Seat(schedule, "A1", 1000L, true);
@@ -183,12 +183,12 @@ class ReservationServiceIntegrateTest {
 		Reservation reservation4 = Reservation.create(user, schedule, seat4);
 		Reservation reservation5 = Reservation.create(user, schedule, seat5);
 
-		reservation1.reserve(LocalDateTime.of(2025, 4, 17, 3, 13));
+		reservation1.reserve(LocalDateTime.of(2025, 4, 17, 3, 13), LocalDateTime.now());
 		reservation1.validateNotExpired(LocalDateTime.of(2025, 4, 17, 3, 13));
-		reservation2.reserve(LocalDateTime.of(2025, 4, 17, 3, 14));
-		reservation3.reserve(LocalDateTime.of(2025, 4, 17, 3, 15));
-		reservation4.reserve(LocalDateTime.of(2025, 4, 17, 3, 16));
-		reservation5.reserve(LocalDateTime.of(2025, 4, 17, 3, 17));
+		reservation2.reserve(LocalDateTime.of(2025, 4, 17, 3, 14), LocalDateTime.now());
+		reservation3.reserve(LocalDateTime.of(2025, 4, 17, 3, 15), LocalDateTime.now());
+		reservation4.reserve(LocalDateTime.of(2025, 4, 17, 3, 16), LocalDateTime.now());
+		reservation5.reserve(LocalDateTime.of(2025, 4, 17, 3, 17), LocalDateTime.now());
 		reservationJpaRepository.saveAll(List.of(reservation1, reservation2, reservation3, reservation4, reservation5));
 
 		// act
@@ -213,5 +213,29 @@ class ReservationServiceIntegrateTest {
 		assertThat(reservation4.getSeat().getIsSelectable()).isFalse();
 		assertThat(reservation5.getSeat().getIsSelectable()).isFalse();
 
+	}
+
+	@Test
+	@DisplayName("아직 오픈되지 않은 스케줄을 예약시 예외가 발생한다.")
+	void reserve_schedule_opened_exception() {
+		// arrange
+		User user = new User("kimbro", "1234");
+		userJpaRepository.save(user);
+
+		Concert concert = new Concert("아이유 10주년 콘서트");
+		concertJpaRepository.save(concert);
+
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now().plusMinutes(5));
+		scheduleJpaRepository.save(schedule);
+
+		Seat seat = new Seat(schedule, "A1", 1000L, true);
+		seatJpaRepository.save(seat);
+
+		ReservationCommand command = new ReservationCommand(user.getId(), schedule.getId(), seat.getId());
+
+		// act & assert
+		assertThatThrownBy(() -> reservationService.reserve(command))
+			.isInstanceOf(BusinessException.class)
+			.hasMessageContaining("아직 오픈되지 않은 스케줄입니다.");
 	}
 }
