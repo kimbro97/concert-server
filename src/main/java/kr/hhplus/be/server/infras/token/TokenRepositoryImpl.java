@@ -44,7 +44,7 @@ public class TokenRepositoryImpl implements TokenRepository {
 
 	@Override
 	public void saveActiveToken(Token token) {
-		tokenRedisRepository.save(token);
+		tokenRedisRepository.saveActiveToken(token);
 	}
 
 	@Override
