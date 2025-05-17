@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +30,7 @@ import kr.hhplus.be.server.infras.concert.ScheduleJpaRepository;
 import kr.hhplus.be.server.infras.concert.SeatJpaRepository;
 import kr.hhplus.be.server.infras.payment.PaymentJpaRepository;
 import kr.hhplus.be.server.infras.reservation.ReservationJpaRepository;
-import kr.hhplus.be.server.infras.token.TokenJpaRepository;
+import kr.hhplus.be.server.infras.token.TokenRedisRepository;
 import kr.hhplus.be.server.infras.user.UserJpaRepository;
 
 @SpringBootTest
@@ -47,7 +46,7 @@ class PaymentServiceConcurrentTests {
 	private SeatJpaRepository seatJpaRepository;
 
 	@Autowired
-	private TokenJpaRepository tokenJpaRepository;
+	private TokenRedisRepository tokenRedisRepository;
 
 	@Autowired
 	private ConcertJpaRepository concertJpaRepository;
@@ -86,7 +85,7 @@ class PaymentServiceConcurrentTests {
 		balanceJpaRepository.save(balance);
 
 		Token token = Token.create(user, schedule, uuid, TokenStatus.ACTIVE);
-		tokenJpaRepository.save(token);
+		tokenRedisRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
 		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());

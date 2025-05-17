@@ -84,7 +84,7 @@ class PaymentServiceTest {
 		assertThat(result.getPaidAt()).isNotNull();
 
 		verify(balance).use(totalAmount);
-		verify(tokenRepository).deleteByUuid("uuid_1");
+		verify(tokenRepository).deleteActiveToken(100L,"uuid_1");
 		verify(paymentRepository).save(any(Payment.class));
 		verify(balanceRepository).saveAndFlush(balance);
 	}

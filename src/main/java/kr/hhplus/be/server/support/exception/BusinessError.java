@@ -44,6 +44,10 @@ public enum BusinessError {
 	NOT_FOUND_TOKEN_ERROR(BAD_REQUEST, "토큰값을 찾을 수 없습니다."),
 	TOKEN_NOT_ACTIVE_ERROR(BAD_REQUEST, "토큰이 ACTIVE 상태가 아니므로 사용할 수 없습니다."),
 
+	// Redis 관련
+	TOKEN_SERIALIZATION_ERROR(INTERNAL_SERVER_ERROR, "토큰 직렬화에 실패했습니다."),
+	TOKEN_DESERIALIZATION_ERROR(INTERNAL_SERVER_ERROR, "토큰 역직렬화에 실패했습니다."),
+
 	// 락 관련
 	LOCK_ACQUISITION_FAILED_ERROR(BAD_REQUEST, "락 획득에 실패했습니다.");
 
