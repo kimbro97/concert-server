@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.api.concert;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,11 @@ import lombok.RequiredArgsConstructor;
 public class ConcertController implements ConcertControllerDocs {
 
 	private final ConcertService concertService;
+
+	@GetMapping("/api/v1/concert/top-ranking")
+	public ApiResponse<List<ConcertInfo>> getConcertTopRanking() {
+		return ApiResponse.OK(concertService.getConcertTopRankings(LocalDateTime.now()));
+	}
 
 	@GetMapping("/api/v1/concert/{concert_id}/schedule")
 	public ApiResponse<List<ConcertInfo.ScheduleInfo>> getConcertSchedules(

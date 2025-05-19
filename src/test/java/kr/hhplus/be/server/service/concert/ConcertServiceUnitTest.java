@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ class ConcertServiceUnitTest {
 		LocalDate endDate = LocalDate.of(2025, 4, 30);
 		Concert concert = new Concert("로미오");
 		ConcertCommand.Schedule command = new ConcertCommand.Schedule(concertId, startDate, endDate);
-		List<Schedule> schedules = List.of(new Schedule(concert, LocalDate.of(2025, 4, 15)));
+		List<Schedule> schedules = List.of(new Schedule(concert, LocalDate.of(2025, 4, 15), LocalDateTime.now()));
 
 		when(concertRepository.findConcertById(concertId)).thenReturn(Optional.of(concert));
 

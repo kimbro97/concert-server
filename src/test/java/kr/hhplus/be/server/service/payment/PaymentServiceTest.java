@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.service.payment;
 
-import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -16,6 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.balance.BalanceRepository;
+import kr.hhplus.be.server.domain.concert.Concert;
+import kr.hhplus.be.server.domain.concert.ConcertRepository;
+import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.payment.Payment;
 import kr.hhplus.be.server.domain.payment.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.PaymentStatus;
@@ -28,37 +30,50 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
-	@Mock UserRepository userRepository;
-	@Mock ReservationRepository reservationRepository;
-	@Mock BalanceRepository balanceRepository;
-	@Mock PaymentRepository paymentRepository;
-	@Mock TokenRepository tokenRepository;
+	@Mock
+	private UserRepository userRepository;
+	@Mock
+	private ReservationRepository reservationRepository;
+	@Mock
+	private BalanceRepository balanceRepository;
+	@Mock
+	private PaymentRepository paymentRepository;
+	@Mock
+	private TokenRepository tokenRepository;
+	@Mock
+	private ConcertRepository concertRepository;
 
 	@InjectMocks PaymentService paymentService;
 
 	@Test
-	@DisplayName("유저, 예약, 잔액이 유효한 경우 결제에 성공하고 PaymentInfo를 반환한다")
+	@DisplayName("유효한 유저, 예약, 잔액이 있는 경우 결제에 성공하고 PaymentInfo를 반환한다")
 	void pay_성공() {
 		// arrange
 		Long userId = 1L;
 		Long reservationId = 10L;
-		Long totalAmount = 20000L;
+		Long totalAmount = 20_000L;
 
 		PaymentCommand command = new PaymentCommand(userId, reservationId, "uuid_1", LocalDateTime.now());
 
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);
 		Balance balance = mock(Balance.class);
+		Schedule schedule = mock(Schedule.class);
+		Concert concert = mock(Concert.class);
 
-		// 기본 정보
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 		when(balanceRepository.findByUserId(userId)).thenReturn(Optional.of(balance));
-		when(reservation.getTotalAmount()).thenReturn(totalAmount);
-		when(reservation.getId()).thenReturn(reservationId);
 
-		// 저장 시 반환 객체 설정
-		when(paymentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+		when(reservation.getTotalAmount()).thenReturn(totalAmount);
+		when(reservation.getSchedule()).thenReturn(schedule);
+
+		when(schedule.getConcert()).thenReturn(concert);
+		when(schedule.getId()).thenReturn(100L);
+		when(concert.getId()).thenReturn(200L);
+
+		when(concertRepository.incrementScheduleCount(any(), any(), any(), any())).thenReturn(1L);
+		when(concertRepository.countByScheduleId(100L)).thenReturn(2L);
 
 		// act
 		PaymentInfo result = paymentService.pay(command);

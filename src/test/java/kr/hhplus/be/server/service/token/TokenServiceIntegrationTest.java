@@ -81,7 +81,7 @@ class TokenServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		TokenCommand command = new TokenCommand(user.getId(), schedule.getId());
@@ -104,7 +104,7 @@ class TokenServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Token token = Token.create(user, schedule, "uuid_1", TokenStatus.ACTIVE);
@@ -129,7 +129,7 @@ class TokenServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Token token1 = Token.create(user, schedule, "uuid_1", TokenStatus.PENDING);
@@ -165,7 +165,7 @@ class TokenServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Token token1 = Token.create(user1, schedule, "uuid_1", TokenStatus.PENDING);
@@ -198,7 +198,7 @@ class TokenServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Token token1 = Token.create(user1, schedule, "uuid_1", TokenStatus.PENDING);

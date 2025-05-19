@@ -4,12 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.balance.Balance;
@@ -48,6 +52,9 @@ class PaymentServiceIntegrationTest {
 	private TokenJpaRepository tokenJpaRepository;
 
 	@Autowired
+	private StringRedisTemplate stringRedisTemplate;
+
+	@Autowired
 	private ConcertJpaRepository concertJpaRepository;
 
 	@Autowired
@@ -61,6 +68,18 @@ class PaymentServiceIntegrationTest {
 
 	@Autowired
 	private ReservationJpaRepository reservationJpaRepository;
+
+	@BeforeEach
+	void setUp() {
+		Set<String> keys = stringRedisTemplate.keys("concert:*:schedule:*:count");
+		if (keys != null && !keys.isEmpty()) {
+			stringRedisTemplate.delete(keys);
+		}
+		Set<String> sortedSet = stringRedisTemplate.keys("concert:ranking:*");
+		if (sortedSet != null && !sortedSet.isEmpty()) {
+			stringRedisTemplate.delete(sortedSet);
+		}
+	}
 
 	@Test
 	@DisplayName("결제시 유저가 존재하지 않으면 예외가 발생한다.")
@@ -103,14 +122,14 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);
 		seatJpaRepository.save(seat);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.now().plusMinutes(5));
+		reservation.reserve(LocalDateTime.now().plusMinutes(5), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -132,7 +151,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 1000L, true);
@@ -142,7 +161,7 @@ class PaymentServiceIntegrationTest {
 		balanceJpaRepository.save(balance);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -164,7 +183,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 10000L, true);
@@ -174,7 +193,7 @@ class PaymentServiceIntegrationTest {
 		balanceJpaRepository.save(balance);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		String uuid = "uuid_1";
@@ -198,7 +217,7 @@ class PaymentServiceIntegrationTest {
 		Concert concert = new Concert("아이유 10주년 콘서트");
 		concertJpaRepository.save(concert);
 
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
 		Seat seat = new Seat(schedule, "A1", 900L, true);
@@ -211,7 +230,7 @@ class PaymentServiceIntegrationTest {
 		tokenJpaRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
-		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35));
+		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
 		reservationJpaRepository.save(reservation);
 
 		PaymentCommand command = new PaymentCommand(user.getId(), reservation.getId(), uuid, LocalDateTime.of(2025, 4, 17, 16, 30));
@@ -223,8 +242,12 @@ class PaymentServiceIntegrationTest {
 		Payment payment = paymentJpaRepository.findById(info.getPaymentId()).orElseThrow();
 		Optional<Token> deleteToken = tokenJpaRepository.findByUuid(uuid);
 		Balance findBalance = balanceJpaRepository.findByUserId(user.getId()).orElseThrow();
+		Long size = stringRedisTemplate.opsForZSet()
+			.size("concert:ranking:" + LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+
 		assertThat(payment.getId()).isEqualTo(info.getPaymentId());
 		assertThat(deleteToken).isEmpty();
 		assertThat(findBalance.getAmount()).isEqualTo(100L);
+		assertThat(size).isEqualTo(1L);
 	}
 }

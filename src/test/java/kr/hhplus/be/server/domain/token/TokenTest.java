@@ -21,7 +21,7 @@ class TokenTest {
 		// arrange
 		User user = new User("tester", "1234");
 		Concert concert = new Concert("락페스티벌");
-		Schedule schedule = new Schedule(concert, LocalDate.now());
+		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		String uuid = "123e4567-e89b-12d3-a456-426614174000";
 		TokenStatus status = ACTIVE;
 
