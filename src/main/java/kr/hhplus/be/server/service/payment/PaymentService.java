@@ -53,7 +53,7 @@ public class PaymentService {
 			Payment payment = Payment.create(user, reservation);
 			payment.pay(balance, command.getNow());
 
-			tokenRepository.deleteByUuid(command.getUuid());
+			tokenRepository.deleteActiveToken(reservation.getSchedule().getId(), command.getUuid());
 			paymentRepository.save(payment);
 			balanceRepository.saveAndFlush(balance);
 
