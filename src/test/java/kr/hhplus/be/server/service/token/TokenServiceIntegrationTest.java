@@ -5,11 +5,14 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.concert.Concert;
@@ -19,7 +22,7 @@ import kr.hhplus.be.server.domain.token.TokenStatus;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.infras.concert.ConcertJpaRepository;
 import kr.hhplus.be.server.infras.concert.ScheduleJpaRepository;
-import kr.hhplus.be.server.infras.token.TokenJpaRepository;
+import kr.hhplus.be.server.infras.token.TokenRedisRepository;
 import kr.hhplus.be.server.infras.user.UserJpaRepository;
 import kr.hhplus.be.server.support.exception.BusinessException;
 
@@ -40,7 +43,15 @@ class TokenServiceIntegrationTest {
 	private ScheduleJpaRepository scheduleJpaRepository;
 
 	@Autowired
-	private TokenJpaRepository tokenJpaRepository;
+	private StringRedisTemplate stringRedisTemplate;
+
+	@Autowired
+	private TokenRedisRepository tokenRedisRepository;
+
+	@AfterEach
+	void tearDown() {
+		stringRedisTemplate.getConnectionFactory().getConnection().serverCommands().flushDb();
+	}
 
 	@Test
 	@DisplayName("토큰 생성시 유저가 존재하지 않으면 예외가 발생한다.")
@@ -89,7 +100,7 @@ class TokenServiceIntegrationTest {
 		// act
 		TokenInfo info = tokenService.createToken(command);
 		// assert
-		Token token = tokenJpaRepository.findById(info.getTokenId()).orElseThrow();
+		Token token = tokenRedisRepository.findByUuid(info.getTokenValue()).orElseThrow();
 		assertThat(info.getTokenId()).isEqualTo(token.getId());
 		assertThat(info.getTokenValue()).isEqualTo(token.getUuid());
 	}
@@ -107,8 +118,11 @@ class TokenServiceIntegrationTest {
 		Schedule schedule = new Schedule(concert, LocalDate.now(), LocalDateTime.now());
 		scheduleJpaRepository.save(schedule);
 
-		Token token = Token.create(user, schedule, "uuid_1", TokenStatus.ACTIVE);
-		tokenJpaRepository.save(token);
+		Token token = Token.create(user, schedule, "uuid_1", TokenStatus.PENDING);
+		tokenRedisRepository.save(token);
+		token.activate(1L, 0L, LocalDateTime.now());
+		tokenRedisRepository.saveActiveToken(token);
+
 
 		TokenLocationCommand command = new TokenLocationCommand("uuid_1");
 		// act
@@ -136,10 +150,10 @@ class TokenServiceIntegrationTest {
 		Token token2 = Token.create(user, schedule, "uuid_2", TokenStatus.PENDING);
 		Token token3 = Token.create(user, schedule, "uuid_3", TokenStatus.PENDING);
 		Token token4 = Token.create(user, schedule, "uuid_4", TokenStatus.PENDING);
-		tokenJpaRepository.save(token1);
-		tokenJpaRepository.save(token2);
-		tokenJpaRepository.save(token3);
-		tokenJpaRepository.save(token4);
+		tokenRedisRepository.save(token1);
+		tokenRedisRepository.save(token2);
+		tokenRedisRepository.save(token3);
+		tokenRedisRepository.save(token4);
 
 		TokenLocationCommand command = new TokenLocationCommand("uuid_2");
 		// act
@@ -174,12 +188,17 @@ class TokenServiceIntegrationTest {
 		Token token4 = Token.create(user4, schedule, "uuid_4", TokenStatus.ACTIVE);
 		Token token5 = Token.create(user5, schedule, "uuid_5", TokenStatus.ACTIVE);
 		Token token6 = Token.create(user6, schedule, "uuid_6", TokenStatus.ACTIVE);
-		tokenJpaRepository.saveAll(List.of(token1, token2, token3, token4, token5, token6));
+		tokenRedisRepository.save(token1);
+		tokenRedisRepository.save(token2);
+		tokenRedisRepository.save(token3);
+		tokenRedisRepository.save(token4);
+		tokenRedisRepository.save(token5);
+		tokenRedisRepository.save(token6);
 
 		// act
 		tokenService.activateToken();
 		// assert
-		Token token = tokenJpaRepository.findByUuid("uuid_1").orElseThrow();
+		Token token = tokenRedisRepository.findByUuid("uuid_1").orElseThrow();
 		assertThat(token.getStatus()).isEqualTo(TokenStatus.ACTIVE);
 	}
 
@@ -207,7 +226,12 @@ class TokenServiceIntegrationTest {
 		Token token4 = Token.create(user4, schedule, "uuid_4", TokenStatus.PENDING);
 		Token token5 = Token.create(user5, schedule, "uuid_5", TokenStatus.PENDING);
 		Token token6 = Token.create(user6, schedule, "uuid_6", TokenStatus.PENDING);
-		tokenJpaRepository.saveAll(List.of(token1, token2, token3, token4, token5, token6));
+		tokenRedisRepository.save(token1);
+		tokenRedisRepository.save(token2);
+		tokenRedisRepository.save(token3);
+		tokenRedisRepository.save(token4);
+		tokenRedisRepository.save(token5);
+		tokenRedisRepository.save(token6);
 
 		token1.activate(1L, 999L, LocalDateTime.of(2025, 4, 17, 13, 30));
 		token2.activate(1L, 999L, LocalDateTime.of(2025, 4, 17, 13, 31));
@@ -215,12 +239,17 @@ class TokenServiceIntegrationTest {
 		token4.activate(1L, 999L, LocalDateTime.of(2025, 4, 17, 13, 33));
 		token5.activate(1L, 999L, LocalDateTime.of(2025, 4, 17, 13, 34));
 		token6.activate(1L, 999L, LocalDateTime.of(2025, 4, 17, 13, 35));
-		tokenJpaRepository.saveAll(List.of(token1, token2, token3, token4, token5, token6));
+		tokenRedisRepository.saveActiveToken(token1);
+		tokenRedisRepository.saveActiveToken(token2);
+		tokenRedisRepository.saveActiveToken(token3);
+		tokenRedisRepository.saveActiveToken(token4);
+		tokenRedisRepository.saveActiveToken(token5);
+		tokenRedisRepository.saveActiveToken(token6);
 	    // act
 		tokenService.expireToken(LocalDateTime.of(2025, 4, 17, 13, 33));
 	    // assert
-		List<Token> byStatus = tokenJpaRepository.findByStatus(TokenStatus.ACTIVE);
-		assertThat(byStatus).hasSize(3);
+		Set<String> activeTokens = tokenRedisRepository.findActiveTokens(schedule.getId());
+		assertThat(activeTokens).hasSize(3);
 	}
 
 

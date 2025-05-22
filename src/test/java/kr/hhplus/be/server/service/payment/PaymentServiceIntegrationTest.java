@@ -33,7 +33,7 @@ import kr.hhplus.be.server.infras.concert.ScheduleJpaRepository;
 import kr.hhplus.be.server.infras.concert.SeatJpaRepository;
 import kr.hhplus.be.server.infras.payment.PaymentJpaRepository;
 import kr.hhplus.be.server.infras.reservation.ReservationJpaRepository;
-import kr.hhplus.be.server.infras.token.TokenJpaRepository;
+import kr.hhplus.be.server.infras.token.TokenRedisRepository;
 import kr.hhplus.be.server.infras.user.UserJpaRepository;
 import kr.hhplus.be.server.support.exception.BusinessException;
 
@@ -54,7 +54,7 @@ class PaymentServiceIntegrationTest {
 	private SeatJpaRepository seatJpaRepository;
 
 	@Autowired
-	private TokenJpaRepository tokenJpaRepository;
+	private TokenRedisRepository tokenRedisRepository;
 
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
@@ -232,7 +232,7 @@ class PaymentServiceIntegrationTest {
 		balanceJpaRepository.save(balance);
 
 		Token token = Token.create(user, schedule, uuid, TokenStatus.ACTIVE);
-		tokenJpaRepository.save(token);
+		tokenRedisRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
 		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());
@@ -245,7 +245,7 @@ class PaymentServiceIntegrationTest {
 
 		// assert
 		Payment payment = paymentJpaRepository.findById(info.getPaymentId()).orElseThrow();
-		Optional<Token> deleteToken = tokenJpaRepository.findByUuid(uuid);
+		Optional<Token> deleteToken = tokenRedisRepository.findByUuid(uuid);
 		Balance findBalance = balanceJpaRepository.findByUserId(user.getId()).orElseThrow();
 
 		assertThat(payment.getId()).isEqualTo(info.getPaymentId());

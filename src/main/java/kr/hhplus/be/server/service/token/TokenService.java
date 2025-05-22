@@ -5,6 +5,7 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -67,15 +68,15 @@ public class TokenService {
 		List<Schedule> schedules = concertRepository.findAllSchedule();
 
 		for (Schedule schedule : schedules) {
-			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusOrderByCreatedAtAsc(
-				schedule.getId(), PENDING);
-			Long activeCount = tokenRepository.countByScheduleIdAndStatus(schedule.getId(), ACTIVE);
+			tokenRepository.findFirstPendingToken(schedule.getId())
+				.ifPresent(token -> {
+					Long activeCount = tokenRepository.countActiveToken(schedule.getId());
 
-			if (!tokens.isEmpty() && activeCount < 1000) {
-				Token first = tokens.get(0);
-				first.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
-				tokenRepository.save(first);
-			}
+					if (activeCount < 1000) {
+						token.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
+						tokenRepository.saveActiveToken(token);
+					}
+				});
 		}
 	}
 
@@ -84,9 +85,18 @@ public class TokenService {
 		List<Schedule> schedules = concertRepository.findAllSchedule();
 
 		for (Schedule schedule : schedules) {
-			List<Token> tokens = tokenRepository.findAllByScheduleIdAndStatusAndExpireAtBefore(schedule, ACTIVE,
-				now);
-			tokenRepository.deleteAll(tokens);
+			//schedules 기반으로 active set으로 조회해온다.
+			Set<String> activeTokens = tokenRepository.findActiveTokens(schedule.getId());
+			// set을 순회하면서 uuid값으로 string token을 조회한다.
+			for (String uuid : activeTokens) {
+				tokenRepository.findByUuid(uuid).ifPresent(token -> {
+					// token 시간이 지났는지 검증한다.
+					if (token.isExpired(now)) {
+						// 자났다면 set과 string token을 삭제한다.
+						tokenRepository.deleteActiveToken(schedule.getId(), uuid);
+					}
+				});
+			}
 		}
 	}
 }
