@@ -15,3 +15,6 @@
 
 ### 동시성 보고서
 - [동시성 보고서](./docs/동시성보고서.md)
+
+### 이벤트 기반 분산 트랜잭션 설계 보고서
+- [이벤트 기반 분산 트랜잭션 설계 보고서](https://kind-artichoke-34f.notion.site/1fba4bf15f1a804f97fee5b8cc399efb?pvs=4)
