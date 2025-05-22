@@ -1,10 +1,7 @@
 package kr.hhplus.be.server.domain.token;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-
-import kr.hhplus.be.server.domain.concert.Schedule;
+import java.util.Set;
 
 public interface TokenRepository {
 
@@ -14,13 +11,13 @@ public interface TokenRepository {
 
 	Long findTokenLocation(Long scheduleId, String uuid, TokenStatus status);
 
-	Long countByScheduleIdAndStatus(Long scheduleId, TokenStatus status);
+	Optional<Token> findFirstPendingToken(Long scheduleId);
 
-	void deleteByUuid(String uuid);
+	Long countActiveToken(Long scheduleId);
 
-	List<Token> findAllByScheduleIdAndStatusOrderByCreatedAtAsc(Long scheduleId, TokenStatus tokenStatus);
+	void saveActiveToken(Token token);
 
-	List<Token> findAllByScheduleIdAndStatusAndExpireAtBefore(Schedule schedule, TokenStatus tokenStatus, LocalDateTime now);
+	Set<String> findActiveTokens(Long scheduleId);
 
-	void deleteAll(List<Token> tokens);
+	void deleteActiveToken(Long scheduleId, String uuid);
 }
