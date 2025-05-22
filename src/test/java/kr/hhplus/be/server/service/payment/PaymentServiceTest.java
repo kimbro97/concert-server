@@ -19,6 +19,7 @@ import kr.hhplus.be.server.domain.concert.Concert;
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.payment.Payment;
+import kr.hhplus.be.server.domain.payment.PaymentEventPublisher;
 import kr.hhplus.be.server.domain.payment.PaymentRepository;
 import kr.hhplus.be.server.domain.payment.PaymentStatus;
 import kr.hhplus.be.server.domain.reservation.Reservation;
@@ -32,16 +33,24 @@ import kr.hhplus.be.server.support.exception.BusinessException;
 class PaymentServiceTest {
 	@Mock
 	private UserRepository userRepository;
-	@Mock
-	private ReservationRepository reservationRepository;
+
 	@Mock
 	private BalanceRepository balanceRepository;
+
 	@Mock
 	private PaymentRepository paymentRepository;
+
 	@Mock
 	private TokenRepository tokenRepository;
+
 	@Mock
 	private ConcertRepository concertRepository;
+
+	@Mock
+	private ReservationRepository reservationRepository;
+
+	@Mock
+	private PaymentEventPublisher paymentEventPublisher;
 
 	@InjectMocks PaymentService paymentService;
 
@@ -59,21 +68,14 @@ class PaymentServiceTest {
 		Reservation reservation = mock(Reservation.class);
 		Balance balance = mock(Balance.class);
 		Schedule schedule = mock(Schedule.class);
-		Concert concert = mock(Concert.class);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 		when(balanceRepository.findByUserId(userId)).thenReturn(Optional.of(balance));
-
 		when(reservation.getTotalAmount()).thenReturn(totalAmount);
+
 		when(reservation.getSchedule()).thenReturn(schedule);
-
-		when(schedule.getConcert()).thenReturn(concert);
 		when(schedule.getId()).thenReturn(100L);
-		when(concert.getId()).thenReturn(200L);
-
-		when(concertRepository.incrementScheduleCount(any(), any(), any(), any())).thenReturn(1L);
-		when(concertRepository.countByScheduleId(100L)).thenReturn(2L);
 
 		// act
 		PaymentInfo result = paymentService.pay(command);
@@ -87,6 +89,7 @@ class PaymentServiceTest {
 		verify(tokenRepository).deleteActiveToken(100L,"uuid_1");
 		verify(paymentRepository).save(any(Payment.class));
 		verify(balanceRepository).saveAndFlush(balance);
+		verify(paymentEventPublisher).paymentCompleted(any(Payment.class));
 	}
 
 

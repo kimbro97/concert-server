@@ -3,9 +3,6 @@ package kr.hhplus.be.server.service.payment;
 import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static kr.hhplus.be.server.support.lock.LockType.*;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.OptimisticLockException;
 import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.balance.BalanceRepository;
-import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.payment.Payment;
+import kr.hhplus.be.server.domain.payment.PaymentEventPublisher;
 import kr.hhplus.be.server.domain.payment.PaymentRepository;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.reservation.ReservationRepository;
@@ -32,7 +29,7 @@ public class PaymentService {
 	private final TokenRepository tokenRepository;
 	private final PaymentRepository paymentRepository;
 	private final BalanceRepository balanceRepository;
-	private final ConcertRepository concertRepository;
+	private final PaymentEventPublisher eventPublisher;
 	private final ReservationRepository reservationRepository;
 
 	@Transactional
@@ -57,16 +54,7 @@ public class PaymentService {
 			paymentRepository.save(payment);
 			balanceRepository.saveAndFlush(balance);
 
-			Long count = concertRepository.incrementScheduleCount(reservation.getSchedule().getConcert().getId(),
-				reservation.getSchedule().getId(), LocalDateTime.now(), reservation.getSchedule().getDate());
-
-			Long seatCount = concertRepository.countByScheduleId(reservation.getSchedule().getId());
-
-			if (count.equals(seatCount)) {
-				LocalDateTime today = LocalDateTime.now();
-				concertRepository.addRanking(today, reservation.getSchedule().getConcert().getId(),
-					Duration.between(reservation.getSchedule().getOpenedAt(), today).toMillis());
-			}
+			eventPublisher.paymentCompleted(payment);
 
 			return PaymentInfo.from(payment);
 
