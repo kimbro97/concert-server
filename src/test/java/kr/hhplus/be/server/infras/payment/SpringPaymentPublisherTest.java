@@ -27,7 +27,7 @@ import kr.hhplus.be.server.infras.concert.ConcertJpaRepository;
 import kr.hhplus.be.server.infras.concert.ScheduleJpaRepository;
 import kr.hhplus.be.server.infras.concert.SeatJpaRepository;
 import kr.hhplus.be.server.infras.reservation.ReservationJpaRepository;
-import kr.hhplus.be.server.infras.token.TokenJpaRepository;
+import kr.hhplus.be.server.infras.token.TokenRedisRepository;
 import kr.hhplus.be.server.infras.user.UserJpaRepository;
 import kr.hhplus.be.server.service.payment.PaymentCommand;
 import kr.hhplus.be.server.service.payment.PaymentService;
@@ -50,7 +50,7 @@ class SpringPaymentPublisherTest {
 	private SeatJpaRepository seatJpaRepository;
 
 	@Autowired
-	private TokenJpaRepository tokenJpaRepository;
+	private TokenRedisRepository tokenRedisRepository;
 
 	@Autowired
 	private ConcertJpaRepository concertJpaRepository;
@@ -87,7 +87,7 @@ class SpringPaymentPublisherTest {
 		balanceJpaRepository.save(balance);
 
 		Token token = Token.create(user, schedule, uuid, TokenStatus.ACTIVE);
-		tokenJpaRepository.save(token);
+		tokenRedisRepository.save(token);
 
 		Reservation reservation = Reservation.create(user, schedule, seat);
 		reservation.reserve(LocalDateTime.of(2025, 4, 17, 16, 35), LocalDateTime.now());

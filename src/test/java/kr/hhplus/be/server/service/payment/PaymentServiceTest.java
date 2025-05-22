@@ -67,12 +67,15 @@ class PaymentServiceTest {
 		User user = new User("kim", "1234");
 		Reservation reservation = mock(Reservation.class);
 		Balance balance = mock(Balance.class);
+		Schedule schedule = mock(Schedule.class);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
 		when(balanceRepository.findByUserId(userId)).thenReturn(Optional.of(balance));
-
 		when(reservation.getTotalAmount()).thenReturn(totalAmount);
+
+		when(reservation.getSchedule()).thenReturn(schedule);
+		when(schedule.getId()).thenReturn(100L);
 
 		// act
 		PaymentInfo result = paymentService.pay(command);
