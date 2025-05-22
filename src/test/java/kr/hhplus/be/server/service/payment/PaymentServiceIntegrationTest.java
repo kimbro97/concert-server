@@ -1,10 +1,10 @@
 package kr.hhplus.be.server.service.payment;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.hhplus.be.server.domain.balance.Balance;
@@ -21,6 +22,7 @@ import kr.hhplus.be.server.domain.concert.Concert;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.concert.Seat;
 import kr.hhplus.be.server.domain.payment.Payment;
+import kr.hhplus.be.server.domain.payment.PaymentEventPublisher;
 import kr.hhplus.be.server.domain.reservation.Reservation;
 import kr.hhplus.be.server.domain.token.Token;
 import kr.hhplus.be.server.domain.token.TokenStatus;
@@ -41,6 +43,9 @@ class PaymentServiceIntegrationTest {
 
 	@Autowired
 	private PaymentService paymentService;
+
+	@MockitoBean
+	private PaymentEventPublisher eventPublisher;
 
 	@Autowired
 	private UserJpaRepository userJpaRepository;
@@ -242,12 +247,11 @@ class PaymentServiceIntegrationTest {
 		Payment payment = paymentJpaRepository.findById(info.getPaymentId()).orElseThrow();
 		Optional<Token> deleteToken = tokenJpaRepository.findByUuid(uuid);
 		Balance findBalance = balanceJpaRepository.findByUserId(user.getId()).orElseThrow();
-		Long size = stringRedisTemplate.opsForZSet()
-			.size("concert:ranking:" + LocalDateTime.now().format(DateTimeFormatter.BASIC_ISO_DATE));
 
 		assertThat(payment.getId()).isEqualTo(info.getPaymentId());
 		assertThat(deleteToken).isEmpty();
 		assertThat(findBalance.getAmount()).isEqualTo(100L);
-		assertThat(size).isEqualTo(1L);
+		// 이벤트 발행이 실행되는지 검증
+		verify(eventPublisher, times(1)).paymentCompleted(any());
 	}
 }
