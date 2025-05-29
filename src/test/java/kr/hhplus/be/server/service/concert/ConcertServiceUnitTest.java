@@ -4,6 +4,7 @@ import static kr.hhplus.be.server.support.exception.BusinessError.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -104,5 +105,97 @@ class ConcertServiceUnitTest {
 			.hasMessageContaining(NOT_FOUND_SCHEDULE_ERROR.getMessage());
 
 		verify(concertRepository, times(0)).findAllSeatByScheduleId(any());
+	}
+
+	@Test
+	@DisplayName("예약 좌석 수가 스케줄 좌석 수와 다르면 랭킹 갱신을 실행하지 않는다.")
+	void add_rankin_increase_success() {
+	    // arrange
+		Long concertId = 1L;
+		Long scheduleId = 2L;
+		Long paymentId = 3L;
+		LocalDate scheduleDate = LocalDate.now();
+		LocalDateTime openedAt = LocalDateTime.now();
+		LocalDateTime today = LocalDateTime.now();
+
+		ConcertCommand.AddRanking command = ConcertCommand.AddRanking
+			.builder()
+			.today(today)
+			.concertId(concertId)
+			.scheduleDate(scheduleDate)
+			.scheduleId(scheduleId)
+			.paymentId(paymentId)
+			.openedAt(openedAt)
+			.build();
+
+		when(concertRepository.incrementScheduleCount(concertId, scheduleId, today, scheduleDate)).thenReturn(39L);
+		when(concertRepository.countByScheduleId(scheduleId)).thenReturn(50L);
+	    // act
+		concertService.addRanking(command);
+	    // assert
+		verify(concertRepository, times(1)).incrementScheduleCount(concertId, scheduleId, today, scheduleDate);
+		verify(concertRepository, times(1)).countByScheduleId(scheduleId);
+		verify(concertRepository, never()).addRanking(today, concertId, Duration.between(openedAt, today).toMillis());
+	}
+
+	@Test
+	@DisplayName("예약 좌석 수가 스케줄 좌석 수와 일치하면 갱신을 실행한다.")
+	void add_rankin_increase_and_ranking_success() {
+		// arrange
+		Long concertId = 1L;
+		Long scheduleId = 2L;
+		Long paymentId = 3L;
+		LocalDate scheduleDate = LocalDate.now();
+		LocalDateTime openedAt = LocalDateTime.now();
+		LocalDateTime today = LocalDateTime.now();
+
+		ConcertCommand.AddRanking command = ConcertCommand.AddRanking
+			.builder()
+			.today(today)
+			.concertId(concertId)
+			.scheduleDate(scheduleDate)
+			.scheduleId(scheduleId)
+			.paymentId(paymentId)
+			.openedAt(openedAt)
+			.build();
+
+		when(concertRepository.incrementScheduleCount(concertId, scheduleId, today, scheduleDate)).thenReturn(50L);
+		when(concertRepository.countByScheduleId(scheduleId)).thenReturn(50L);
+		// act
+		concertService.addRanking(command);
+		// assert
+		verify(concertRepository, times(1)).incrementScheduleCount(concertId, scheduleId, today, scheduleDate);
+		verify(concertRepository, times(1)).countByScheduleId(scheduleId);
+		verify(concertRepository, times(1)).addRanking(today, concertId, Duration.between(openedAt, today).toMillis());
+	}
+
+	@Test
+	@DisplayName("addRanking 수행 중 예외 발생 시 이후 로직이 실행되지 않아야 한다")
+	void add_rankin_exception() {
+		// arrange
+		Long concertId = 1L;
+		Long scheduleId = 2L;
+		Long paymentId = 3L;
+		LocalDate scheduleDate = LocalDate.now();
+		LocalDateTime openedAt = LocalDateTime.now();
+		LocalDateTime today = LocalDateTime.now();
+
+		ConcertCommand.AddRanking command = ConcertCommand.AddRanking
+			.builder()
+			.today(today)
+			.concertId(concertId)
+			.scheduleDate(scheduleDate)
+			.scheduleId(scheduleId)
+			.paymentId(paymentId)
+			.openedAt(openedAt)
+			.build();
+
+		when(concertRepository.incrementScheduleCount(concertId, scheduleId, today, scheduleDate)).thenThrow(RuntimeException.class);
+		// act
+		concertService.addRanking(command);
+		// assert
+		verify(concertRepository, times(1)).incrementScheduleCount(concertId, scheduleId, today, scheduleDate);
+		verify(concertRepository, never()).countByScheduleId(scheduleId);
+		verify(concertRepository, never()).addRanking(today, concertId, Duration.between(openedAt, today).toMillis());
 	}
 }
