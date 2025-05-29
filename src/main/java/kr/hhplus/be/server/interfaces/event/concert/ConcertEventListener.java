@@ -1,12 +1,9 @@
 package kr.hhplus.be.server.interfaces.event.concert;
 
-import static org.springframework.transaction.event.TransactionPhase.*;
-
 import java.time.LocalDateTime;
 
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent;
 import kr.hhplus.be.server.service.concert.ConcertCommand;
@@ -19,8 +16,7 @@ public class ConcertEventListener {
 
 	private final ConcertService concertService;
 
-	@Async
-	@TransactionalEventListener(phase = AFTER_COMMIT)
+	@KafkaListener(topics = "payment-completed", groupId = "concert-ranking-group")
 	public void paymentUpdateRankingIfSoldOut(PaymentCompletedEvent event) {
 		concertService.addRanking(
 			ConcertCommand.AddRanking
