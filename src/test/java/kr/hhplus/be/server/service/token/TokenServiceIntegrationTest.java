@@ -196,7 +196,7 @@ class TokenServiceIntegrationTest {
 		tokenRedisRepository.save(token6);
 
 		// act
-		tokenService.activateToken();
+		tokenService.activateToken(schedule.getId());
 		// assert
 		Token token = tokenRedisRepository.findByUuid("uuid_1").orElseThrow();
 		assertThat(token.getStatus()).isEqualTo(TokenStatus.ACTIVE);

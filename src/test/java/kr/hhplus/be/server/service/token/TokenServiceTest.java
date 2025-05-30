@@ -125,15 +125,12 @@ class TokenServiceTest {
 	@DisplayName("활성화 대상 토큰이 있고 active 수가 1000 미만이면 토큰을 활성화하고 저장한다")
 	void activateToken_success() {
 		Schedule schedule = mock(Schedule.class);
-		when(schedule.getId()).thenReturn(1L);
 		Token token = Token.create(new User("testUser", "1234"), schedule, "uuid", PENDING);
-		List<Schedule> schedules = List.of(schedule);
 
-		when(concertRepository.findAllSchedule()).thenReturn(schedules);
 		when(tokenRepository.findFirstPendingToken(1L)).thenReturn(Optional.of(token));
 		when(tokenRepository.countActiveToken(1L)).thenReturn(999L);
 
-		tokenService.activateToken();
+		tokenService.activateToken(1L);
 
 		assertThat(token.getStatus()).isEqualTo(ACTIVE);
 		verify(tokenRepository).saveActiveToken(token);
@@ -143,15 +140,12 @@ class TokenServiceTest {
 	@DisplayName("ACTIVE 토큰 수가 1000 이상이면 활성화되지 않는다")
 	void activateToken_noActivationIfMaxReached() {
 		Schedule schedule = mock(Schedule.class);
-		when(schedule.getId()).thenReturn(1L);
 		Token token = Token.create(new User("testUser", "1234"), schedule, "uuid", PENDING);
-		List<Schedule> schedules = List.of(schedule);
 
-		when(concertRepository.findAllSchedule()).thenReturn(schedules);
 		when(tokenRepository.findFirstPendingToken(1L)).thenReturn(Optional.of(token));
 		when(tokenRepository.countActiveToken(1L)).thenReturn(1000L);
 
-		tokenService.activateToken();
+		tokenService.activateToken(1L);
 
 		assertThat(token.getStatus()).isEqualTo(PENDING);
 		verify(tokenRepository, never()).saveActiveToken(token);
