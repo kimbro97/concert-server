@@ -17,6 +17,7 @@ import kr.hhplus.be.server.domain.token.Token;
 import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -64,20 +65,16 @@ public class TokenService {
 	}
 
 	@Transactional
-	public void activateToken() {
-		List<Schedule> schedules = concertRepository.findAllSchedule();
+	public void activateToken(Long scheduleId) {
+		tokenRepository.findFirstPendingToken(scheduleId)
+			.ifPresent(token -> {
+				Long activeCount = tokenRepository.countActiveToken(scheduleId);
 
-		for (Schedule schedule : schedules) {
-			tokenRepository.findFirstPendingToken(schedule.getId())
-				.ifPresent(token -> {
-					Long activeCount = tokenRepository.countActiveToken(schedule.getId());
-
-					if (activeCount < 1000) {
-						token.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
-						tokenRepository.saveActiveToken(token);
-					}
-				});
-		}
+				if (activeCount < 1000) {
+					token.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
+					tokenRepository.saveActiveToken(token);
+				}
+			});
 	}
 
 	@Transactional
