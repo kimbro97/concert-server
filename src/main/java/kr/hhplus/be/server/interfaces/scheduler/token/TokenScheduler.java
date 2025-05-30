@@ -14,10 +14,10 @@ public class TokenScheduler {
 
 	private final TokenService tokenService;
 
-	@Scheduled(fixedRate = 10000)
-	public void activateToken() {
-		tokenService.activateToken();
-	}
+	// @Scheduled(fixedRate = 10000)
+	// public void activateToken() {
+	// 	tokenService.activateToken();
+	// }
 
 	@Scheduled(fixedRate = 10000)
 	public void expireToken() {
