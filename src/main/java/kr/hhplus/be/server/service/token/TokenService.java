@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.token.Token;
+import kr.hhplus.be.server.domain.token.TokenEventPublisher;
 import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
@@ -27,6 +28,7 @@ public class TokenService {
 	private final UserRepository userRepository;
 	private final TokenRepository tokenRepository;
 	private final ConcertRepository concertRepository;
+	private final TokenEventPublisher tokenEventPublisher;
 
 	@Transactional
 	public TokenInfo createToken(TokenCommand command) {
@@ -41,6 +43,8 @@ public class TokenService {
 		Token token = Token.create(user, schedule, uuid, PENDING);
 
 		Token savedToken = tokenRepository.save(token);
+
+		tokenEventPublisher.createToken(token);
 
 		return TokenInfo.from(savedToken);
 	}
