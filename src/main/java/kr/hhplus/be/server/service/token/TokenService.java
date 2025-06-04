@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.domain.concert.ConcertRepository;
 import kr.hhplus.be.server.domain.concert.Schedule;
 import kr.hhplus.be.server.domain.token.Token;
+import kr.hhplus.be.server.domain.token.TokenEventPublisher;
 import kr.hhplus.be.server.domain.token.TokenRepository;
 import kr.hhplus.be.server.domain.user.User;
 import kr.hhplus.be.server.domain.user.UserRepository;
+import kr.hhplus.be.server.support.exception.BusinessError;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +28,7 @@ public class TokenService {
 	private final UserRepository userRepository;
 	private final TokenRepository tokenRepository;
 	private final ConcertRepository concertRepository;
+	private final TokenEventPublisher tokenEventPublisher;
 
 	@Transactional
 	public TokenInfo createToken(TokenCommand command) {
@@ -40,6 +43,8 @@ public class TokenService {
 		Token token = Token.create(user, schedule, uuid, PENDING);
 
 		Token savedToken = tokenRepository.save(token);
+
+		tokenEventPublisher.createToken(token);
 
 		return TokenInfo.from(savedToken);
 	}
@@ -64,20 +69,16 @@ public class TokenService {
 	}
 
 	@Transactional
-	public void activateToken() {
-		List<Schedule> schedules = concertRepository.findAllSchedule();
+	public void activateToken(Long scheduleId) {
+		tokenRepository.findFirstPendingToken(scheduleId)
+			.ifPresent(token -> {
+				Long activeCount = tokenRepository.countActiveToken(scheduleId);
 
-		for (Schedule schedule : schedules) {
-			tokenRepository.findFirstPendingToken(schedule.getId())
-				.ifPresent(token -> {
-					Long activeCount = tokenRepository.countActiveToken(schedule.getId());
-
-					if (activeCount < 1000) {
-						token.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
-						tokenRepository.saveActiveToken(token);
-					}
-				});
-		}
+				if (activeCount < 1000) {
+					token.activate(1L, activeCount, LocalDateTime.now().plusMinutes(10));
+					tokenRepository.saveActiveToken(token);
+				}
+			});
 	}
 
 	@Transactional
