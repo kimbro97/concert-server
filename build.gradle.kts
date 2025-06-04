@@ -41,6 +41,9 @@ dependencies {
 	// redisson
 	implementation("org.redisson:redisson-spring-boot-starter:3.46.0")
 
+	// kafka
+	implementation ("org.springframework.kafka:spring-kafka")
+
 	// swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
